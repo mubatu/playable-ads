@@ -38,17 +38,20 @@ const Character = (function () {
     }
 
     // ---- Build character group ----
-    const group = new THREE.Group();
+    const group = new THREE.Group();        // outer group: position + movement rotation
+    const model = new THREE.Group();        // inner group: flipped so face points -Z
+    model.rotation.y = Math.PI;
+    group.add(model);
 
     // -- Torso (red flannel shirt) --
     const torso = box(1.0, 1.2, 0.6, shirtMat);
     torso.position.y = 2.1;
-    group.add(torso);
+    model.add(torso);
 
     // -- Belt --
     const belt = box(1.05, 0.15, 0.65, beltMat);
     belt.position.y = 1.45;
-    group.add(belt);
+    model.add(belt);
 
     // -- Head --
     const head = new THREE.Mesh(
@@ -57,22 +60,22 @@ const Character = (function () {
     );
     head.castShadow = true;
     head.position.y = 3.1;
-    group.add(head);
+    model.add(head);
 
     // -- Hair (flat cap on top) --
     const hair = box(0.75, 0.2, 0.75, hairMat);
     hair.position.y = 3.55;
-    group.add(hair);
+    model.add(hair);
 
     // -- Eyes (two small dark cubes) --
     const eyeGeo = new THREE.BoxGeometry(0.1, 0.1, 0.05);
     const eyeMat = mat(0x222222);
     const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
     eyeL.position.set(-0.18, 3.15, 0.35);
-    group.add(eyeL);
+    model.add(eyeL);
     const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
     eyeR.position.set(0.18, 3.15, 0.35);
-    group.add(eyeR);
+    model.add(eyeR);
 
     // -- Arms --
     //  Left arm (pivot at shoulder)
@@ -85,7 +88,7 @@ const Character = (function () {
     const leftHand = box(0.25, 0.25, 0.25, skinMat);
     leftHand.position.y = -1.0;
     leftArm.add(leftHand);
-    group.add(leftArm);
+    model.add(leftArm);
 
     //  Right arm (pivot at shoulder)
     const rightArm = new THREE.Group();
@@ -97,7 +100,7 @@ const Character = (function () {
     const rightHand = box(0.25, 0.25, 0.25, skinMat);
     rightHand.position.y = -1.0;
     rightArm.add(rightHand);
-    group.add(rightArm);
+    model.add(rightArm);
 
     // -- Legs --
     //  Left leg (pivot at hip)
@@ -110,7 +113,7 @@ const Character = (function () {
     const leftBoot = box(0.42, 0.35, 0.55, bootsMat);
     leftBoot.position.set(0, -1.1, 0.05);
     leftLeg.add(leftBoot);
-    group.add(leftLeg);
+    model.add(leftLeg);
 
     //  Right leg (pivot at hip)
     const rightLeg = new THREE.Group();
@@ -122,7 +125,7 @@ const Character = (function () {
     const rightBoot = box(0.42, 0.35, 0.55, bootsMat);
     rightBoot.position.set(0, -1.1, 0.05);
     rightLeg.add(rightBoot);
-    group.add(rightLeg);
+    model.add(rightLeg);
 
     // -- Axe (attached to right hand) --
     const axeGroup = new THREE.Group();
@@ -138,8 +141,9 @@ const Character = (function () {
     axeGroup.rotation.x = -0.3;
     rightArm.add(axeGroup);
 
-    // ---- Place at world origin ----
+    // ---- Place at world origin, facing the camera ----
     group.position.set(0, 0, 0);
+    group.rotation.y = Math.PI;  // face toward camera at start
 
     // ---- Shadow blob (circle under feet) ----
     const shadowGeo = new THREE.CircleGeometry(0.6, 16);
