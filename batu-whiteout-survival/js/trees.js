@@ -19,7 +19,7 @@ const Trees = (function () {
     const CANOPY_BASE_RADIUS = 2.0;
     const CANOPY_LAYER_HEIGHT = 2.0;
     const CANOPY_OVERLAP = 0.8;     // how much each cone overlaps the one below
-    const CUT_RANGE = 2.5;          // how close the character must be to cut
+    const CUT_RANGE = 1.5;          // how close the character must be to cut
 
     const TRUNK_COLOR = 0x5C3A1E;
     const CANOPY_COLOR = 0x2D5A27;

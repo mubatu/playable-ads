@@ -1,6 +1,5 @@
 /**
- * scene.js — Scene setup: renderer, scene, lighting
- * No sky — background is a muted neutral color.
+ * scene.js — Scene setup: renderer, scene, lighting, sky gradient
  */
 
 const GameScene = (function () {
@@ -16,10 +15,25 @@ const GameScene = (function () {
 
     // ---- Scene ----
     const scene = new THREE.Scene();
-    // Muted warm grey — acts as "no sky", just empty space above the ground
-    scene.background = new THREE.Color(0xc8b99a);
-    // Fog that blends terrain edges into the background
-    scene.fog = new THREE.Fog(0xc8b99a, 40, 80);
+
+    // Sky gradient (top-down: blue → pale horizon)
+    const skyCanvas = document.createElement('canvas');
+    skyCanvas.width = 1;
+    skyCanvas.height = 256;
+    const ctx = skyCanvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 0, 256);
+    grad.addColorStop(0.0, '#4A90D9');   // top — deeper blue
+    grad.addColorStop(0.4, '#78c9e8');   // mid — sky blue
+    grad.addColorStop(0.8, '#d4e7f5');   // low — pale blue
+    grad.addColorStop(1.0, '#f0e8d8');   // horizon — warm haze
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1, 256);
+    const skyTexture = new THREE.CanvasTexture(skyCanvas);
+    skyTexture.mapping = THREE.EquirectangularReflectionMapping;
+    scene.background = skyTexture;
+
+    // Fog that blends terrain edges into the horizon color
+    scene.fog = new THREE.Fog(0xd4e7f5, 40, 80);
 
     // ---- Lighting ----
     // Hemisphere light: warm sky / cool ground
