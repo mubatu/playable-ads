@@ -73,6 +73,14 @@
             if (cutResult) {
                 chopping = true;
                 chopTimer = 0;
+
+                // Project tree position to screen for the +3 popup
+                const treePos = cutResult.group.position.clone();
+                treePos.y += 4; // show above the tree
+                const projected = treePos.project(camera);
+                const sx = (projected.x *  0.5 + 0.5) * window.innerWidth;
+                const sy = (projected.y * -0.5 + 0.5) * window.innerHeight;
+                Score.addTree(sx, sy);
             }
         }
 
