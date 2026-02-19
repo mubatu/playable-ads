@@ -186,6 +186,36 @@ const Grid = (function () {
 
                 writeRow++;
             }
+
+            // Fill remaining empty cells with newly generated cubes from above
+            for (let spawnTargetRow = writeRow; spawnTargetRow < ROWS; spawnTargetRow++) {
+                const type = CUBE_TYPES[Math.floor(Math.random() * CUBE_TYPES.length)];
+
+                // Spawn outside the board so cubes visibly fall in from above
+                const spawnRow = ROWS + (spawnTargetRow - writeRow);
+                const mesh = createCubeMesh(type, spawnRow, col);
+                GameScene.scene.add(mesh);
+
+                const cell = { type: type, mesh: mesh };
+                cells[spawnTargetRow][col] = cell;
+
+                const targetPos = gridToWorld(spawnTargetRow, col);
+                mesh.userData.row = spawnTargetRow;
+                mesh.userData.col = col;
+
+                const distance = Math.abs(spawnRow - spawnTargetRow);
+                const duration = Math.max(MIN_FALL_DURATION, distance * FALL_DURATION_PER_CELL);
+
+                activeFalls.push({
+                    mesh: mesh,
+                    startY: mesh.position.y,
+                    targetY: targetPos.y,
+                    elapsed: 0,
+                    duration: duration
+                });
+
+                hasMovement = true;
+            }
         }
 
         return hasMovement;
