@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="ad.orientation" content="portrait,landscape">
+    <title>Basic Playable Ad</title>
+    <style>
+        /* CSS: Styling and Reset */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling */
+            background-color: #222;
+            font-family: Arial, sans-serif;
+            touch-action: none; /* Disables browser zooming/panning */
+        }
+
+        /* The Game Container */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The "Target" (The Enemy) */
+        #target {
+            width: 80px;
+            height: 80px;
+            background-color: #ff4757;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.6);
+            transition: transform 0.1s;
+        }
+
+        #target:active {
+            transform: scale(0.9);
+        }
+
+        /* HUD: Heads Up Display */
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            pointer-events: none; /* Let clicks pass through to the game */
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        /* The End Card (CTA) - Hidden by default */
+        #end-card {
+            display: none; /* Hidden initially */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            animation: fadeIn 0.5s;
+        }
+
+        #end-card h1 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        /* The "Install" Button */
+        .cta-button {
+            padding: 15px 40px;
+            background-color: #2ed573;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(46, 213, 115, 0.4);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="ui-layer">Tap the ball: <span id="score">0</span>/5</div>
+        
+        <div id="target"></div>
+
+        <div id="end-card">
+            <h1>Awesome!</h1>
+            <button class="cta-button" onclick="installApp()">INSTALL NOW</button>
+        </div>
+    </div>
+
+    <script>
+        // JAVASCRIPT: The Game Logic
+
+        // 1. Setup Variables
+        const target = document.getElementById('target');
+        const scoreDisplay = document.getElementById('score');
+        const endCard = document.getElementById('end-card');
+        const container = document.getElementById('game-container');
+        
+        let score = 0;
+        const maxScore = 5;
+        let gameActive = true;
+
+        // 2. Logic to move the ball randomly
+        function moveTarget() {
+            if (!gameActive) return;
+
+            // Calculate boundaries (accounting for ball size)
+            const maxX = container.clientWidth - 80;
+            const maxY = container.clientHeight - 80;
+
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+        }
+
+        // 3. Handle Clicks (Interaction)
+        target.addEventListener('click', () => {
+            if (!gameActive) return;
+
+            score++;
+            scoreDisplay.innerText = score;
+
+            if (score >= maxScore) {
+                endGame();
+            } else {
+                moveTarget(); // Move to new spot instantly on click
+            }
+        });
+
+        // 4. Game Loop (Optional: auto-move ball every second to add difficulty)
+        const autoMove = setInterval(() => {
+            if(gameActive) moveTarget();
+        }, 1000);
+
+        // 5. Win State / End Card
+        function endGame() {
+            gameActive = false;
+            clearInterval(autoMove);
+            endCard.style.display = 'flex'; // Show the CTA
+        }
+
+        // 6. The "Install" Logic (CTA)
+        function installApp() {
+            // In a real ad network, this connects to the store SDK
+            // For now, we just log it or open a link
+            console.log("Redirecting to App Store...");
+            
+            // Standard method to open store link:
+            window.open("https://www.google.com", "_blank"); 
+        }
+
+        // Initialize first position
+        moveTarget();
+
+    </script>
+</body>
+</html>
