@@ -8,10 +8,13 @@ const Grid = (function () {
     const CUBE_TYPES = ['red', 'blue', 'green', 'yellow'];
     const FRAME_PADDING = 0.15;
     const FRAME_THICKNESS = 0.01;
+    const FALL_DURATION_PER_CELL = 0.08;
+    const MIN_FALL_DURATION = 0.08;
 
     // 2D array: cells[row][col] = { type: string, mesh: THREE.Mesh } | null
     let cells = [];
     let frameGroup = null;
+    let activeFalls = [];
 
     // Texture cache so we load each PNG only once
     const textureCache = {};
@@ -142,6 +145,72 @@ const Grid = (function () {
         GameScene.scene.add(frameGroup);
     }
 
+    function clearFallingState() {
+        activeFalls = [];
+    }
+
+    function applyGravity() {
+        clearFallingState();
+
+        let hasMovement = false;
+
+        for (let col = 0; col < COLS; col++) {
+            let writeRow = 0;
+
+            for (let readRow = 0; readRow < ROWS; readRow++) {
+                const cell = cells[readRow][col];
+                if (!cell) continue;
+
+                const targetRow = writeRow;
+                cells[readRow][col] = null;
+                cells[targetRow][col] = cell;
+
+                if (targetRow !== readRow) {
+                    hasMovement = true;
+
+                    const targetPos = gridToWorld(targetRow, col);
+                    cell.mesh.userData.row = targetRow;
+                    cell.mesh.userData.col = col;
+
+                    const distance = Math.abs(readRow - targetRow);
+                    const duration = Math.max(MIN_FALL_DURATION, distance * FALL_DURATION_PER_CELL);
+
+                    activeFalls.push({
+                        mesh: cell.mesh,
+                        startY: cell.mesh.position.y,
+                        targetY: targetPos.y,
+                        elapsed: 0,
+                        duration: duration
+                    });
+                }
+
+                writeRow++;
+            }
+        }
+
+        return hasMovement;
+    }
+
+    function update(delta) {
+        for (let i = activeFalls.length - 1; i >= 0; i--) {
+            const fall = activeFalls[i];
+            fall.elapsed += delta;
+
+            const t = Math.min(1, fall.elapsed / fall.duration);
+            const eased = 1 - Math.pow(1 - t, 3);
+            fall.mesh.position.y = fall.startY + (fall.targetY - fall.startY) * eased;
+
+            if (t >= 1) {
+                fall.mesh.position.y = fall.targetY;
+                activeFalls.splice(i, 1);
+            }
+        }
+    }
+
+    function isAnimating() {
+        return activeFalls.length > 0;
+    }
+
     // Convert world position to grid indices (returns null if outside grid)
     function worldToGrid(x, y) {
         const offsetX = -(COLS - 1) * CELL_SIZE / 2;
@@ -178,6 +247,7 @@ const Grid = (function () {
     // Initialize the grid with random cubes
     function init() {
         createFrame();
+        clearFallingState();
         cells = [];
         for (let r = 0; r < ROWS; r++) {
             cells[r] = [];
@@ -230,6 +300,9 @@ const Grid = (function () {
         init: init,
         getCell: getCell,
         removeCells: removeCells,
+        applyGravity: applyGravity,
+        update: update,
+        isAnimating: isAnimating,
         worldToGrid: worldToGrid,
         gridToWorld: gridToWorld,
         getAllMeshes: getAllMeshes

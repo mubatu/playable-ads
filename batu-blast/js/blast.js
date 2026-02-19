@@ -141,6 +141,7 @@ const Blast = (function () {
 
             if (blast.age >= blast.duration) {
                 Grid.removeCells(blast.group);
+                Grid.applyGravity();
                 activeBlasts.splice(i, 1);
             }
         }

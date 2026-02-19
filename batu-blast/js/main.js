@@ -36,7 +36,7 @@
         var intersects = raycaster.intersectObjects(meshes);
 
         if (intersects.length > 0) {
-            if (Blast.isBusy()) return;
+            if (Blast.isBusy() || Grid.isAnimating()) return;
             var hit = intersects[0].object;
             var row = hit.userData.row;
             var col = hit.userData.col;
@@ -51,6 +51,7 @@
         requestAnimationFrame(animate);
         var delta = Math.min(clock.getDelta(), 0.05);
         Blast.update(delta);
+        Grid.update(delta);
         renderer.render(scene, camera);
     }
 
