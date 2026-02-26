@@ -38,13 +38,13 @@ earthGroup.add(earthMesh);
 // earthGroup.add(lightsMesh);
 
 // Hemisphere Light
-// const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcccccc);
-// scene.add(hemiLight);
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcccccc);
+scene.add(hemiLight);
 
 // Sun Light
 const sunLight = new THREE.DirectionalLight(0xffffff);
 sunLight.position.set(-2, -0.5, 1.5);
-scene.add(sunLight);
+//scene.add(sunLight);
 
 // Animate loop
 function animate() {
