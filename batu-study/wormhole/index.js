@@ -15,16 +15,11 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
-// Orbit controls
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.03;
-
 // Create a line geometry from the spline points
-const points = spline.getPoints(100);
-const geometry = new THREE.BufferGeometry().setFromPoints(points);
-const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
-const line = new THREE.Line(geometry, material);
+// const points = spline.getPoints(100);
+// const geometry = new THREE.BufferGeometry().setFromPoints(points);
+// const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+// const line = new THREE.Line(geometry, material);
 // scene.add(line);
 
 // Create a tube geometry from the spline points
@@ -37,6 +32,8 @@ const tubeMat = new THREE.MeshBasicMaterial({
 const tube = new THREE.Mesh(tubeGeo, tubeMat);
 scene.add(tube);
 
+// NOT: Basic -> her zaman gözüküyor, Standard -> ışıklandırmaya göre gözüküyor
+
 // Hemisphere Light
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcccccc);
 scene.add(hemiLight);
@@ -44,12 +41,12 @@ scene.add(hemiLight);
 function updateCamera(t) {
     const time = t * 0.1;
     const looptime = 8 * 1000;
-    const p = (time % looptime) / looptime;
+    const p = (time % looptime) / looptime; // p her zaman 0,1 arasında
 
     const pos = tubeGeo.parameters.path.getPointAt(p);
-    const lookAt = tubeGeo.parameters.path.getPointAt((p + 0.03) % 1);
-
     camera.position.copy(pos);
+
+    const lookAt = tubeGeo.parameters.path.getPointAt((p + 0.03) % 1);
     camera.lookAt(lookAt);
 }
 
@@ -61,6 +58,5 @@ function animate(t = 0) {
 
     // RENDER
     renderer.render(scene, camera);
-    controls.update();
 }
 animate();
