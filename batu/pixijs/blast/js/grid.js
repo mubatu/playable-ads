@@ -9,6 +9,9 @@ const TEXTURE_MAP = {
     yellow: 'assets/yellow_cube.png',
 };
 
+const FALL_SPEED = 0.18;   // lerp factor per frame (0-1, higher = faster)
+const FALL_DELAY_PER_ROW = 3; // extra frames of delay per row distance
+
 export class Grid {
     constructor(app, particleSystem) {
         this.app = app;
@@ -17,6 +20,7 @@ export class Grid {
         this.cells = []; // 2D array [row][col]
         this.tileSize = 0;
         this.padding = 4;
+        this.animating = false; // lock input while tiles settle
 
         this.app.stage.addChild(this.container);
     }
@@ -94,21 +98,26 @@ export class Grid {
     }
 
     /**
-     * Blast (remove) a group of connected tiles with particle effects.
+     * Blast (remove) a group of connected tiles with particle effects,
+     * then collapse columns and spawn new tiles.
      */
     blast(tiles) {
         if (tiles.length < 2) return; // need at least 2 to blast
 
+        this.animating = true;
+
         // Emit particles for the whole group
         this.particles.emitGroup(tiles, this.container, this.tileSize, this.padding);
 
+        // Remove tiles from grid data immediately
         for (const { row, col, tile } of tiles) {
             this.cells[row][col] = null;
-
-            // Quick shrink so the tile disappears while particles fly
             tile.eventMode = 'none';
             this.animateTileRemove(tile);
         }
+
+        // After a short delay let tiles settle
+        setTimeout(() => this.collapseAndRefill(), 150);
     }
 
     /**
@@ -140,10 +149,130 @@ export class Grid {
         this.app.ticker.add(tick);
     }
 
+    // ─── Collapse & Refill ────────────────────────────────────────────
+
+    /**
+     * For each column, shift existing tiles down to fill gaps,
+     * then spawn new random tiles above to fill the rest.
+     */
+    collapseAndRefill() {
+        const animations = []; // collect all pending fall animations
+
+        for (let col = 0; col < GRID_COLS; col++) {
+            // Collect non-null tiles bottom-up
+            const stack = [];
+            for (let row = GRID_ROWS - 1; row >= 0; row--) {
+                if (this.cells[row][col]) {
+                    stack.push(this.cells[row][col]);
+                }
+            }
+
+            // Number of empty slots that need new tiles
+            const emptyCount = GRID_ROWS - stack.length;
+
+            // Rebuild the column in cells array
+            // stack[0] = bottom-most existing tile → goes to row GRID_ROWS-1
+            for (let i = 0; i < stack.length; i++) {
+                const newRow = GRID_ROWS - 1 - i;
+                const tile = stack[i];
+                this.cells[newRow][col] = tile;
+
+                // Update sprite metadata
+                tile.gridRow = newRow;
+                tile.gridCol = col;
+                // Re-bind tap to new row
+                tile.removeAllListeners('pointertap');
+                tile.on('pointertap', () => this.onTileTap(newRow, col));
+
+                // Target y
+                const targetY = newRow * (this.tileSize + this.padding);
+                if (tile.y !== targetY) {
+                    const distance = Math.abs(newRow - tile.gridRow);
+                    animations.push({ tile, targetY, delay: 0 });
+                }
+            }
+
+            // Spawn new tiles for the empty slots at the top
+            for (let i = 0; i < emptyCount; i++) {
+                const newRow = emptyCount - 1 - i;
+                const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+                const tile = this.createTile(newRow, col, color);
+
+                // Start the tile above the grid so it falls in
+                const spawnOffsetRows = emptyCount - i;
+                tile.y = -(spawnOffsetRows) * (this.tileSize + this.padding);
+                tile.alpha = 0.7;
+
+                this.cells[newRow][col] = tile;
+
+                const targetY = newRow * (this.tileSize + this.padding);
+                animations.push({
+                    tile,
+                    targetY,
+                    delay: i * FALL_DELAY_PER_ROW,
+                    fadeIn: true,
+                });
+            }
+        }
+
+        // Run all fall animations
+        if (animations.length > 0) {
+            this.runFallAnimations(animations);
+        } else {
+            this.animating = false;
+        }
+    }
+
+    /**
+     * Smoothly animate tiles to their target Y positions using lerp.
+     */
+    runFallAnimations(animations) {
+        let frame = 0;
+
+        const tick = () => {
+            frame++;
+            let allDone = true;
+
+            for (const anim of animations) {
+                if (anim.done) continue;
+
+                // Delay before this tile starts moving
+                if (frame < anim.delay) {
+                    allDone = false;
+                    continue;
+                }
+
+                const tile = anim.tile;
+                const dy = anim.targetY - tile.y;
+
+                if (Math.abs(dy) < 0.5) {
+                    // Snap to final position
+                    tile.y = anim.targetY;
+                    tile.alpha = 1;
+                    anim.done = true;
+                } else {
+                    tile.y += dy * FALL_SPEED;
+                    if (anim.fadeIn) {
+                        tile.alpha = Math.min(1, tile.alpha + 0.08);
+                    }
+                    allDone = false;
+                }
+            }
+
+            if (allDone) {
+                this.app.ticker.remove(tick);
+                this.animating = false;
+            }
+        };
+
+        this.app.ticker.add(tick);
+    }
+
     /**
      * Handle a tile tap/click — find connected group and blast it.
      */
     onTileTap(row, col) {
+        if (this.animating) return; // ignore taps while tiles are settling
         const connected = this.getConnectedTiles(row, col);
         this.blast(connected);
     }
