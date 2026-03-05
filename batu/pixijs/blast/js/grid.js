@@ -10,8 +10,9 @@ const TEXTURE_MAP = {
 };
 
 export class Grid {
-    constructor(app) {
+    constructor(app, particleSystem) {
         this.app = app;
+        this.particles = particleSystem;
         this.container = new PIXI.Container();
         this.cells = []; // 2D array [row][col]
         this.tileSize = 0;
@@ -93,32 +94,35 @@ export class Grid {
     }
 
     /**
-     * Blast (remove) a group of connected tiles with a scale-down animation.
+     * Blast (remove) a group of connected tiles with particle effects.
      */
     blast(tiles) {
         if (tiles.length < 2) return; // need at least 2 to blast
 
+        // Emit particles for the whole group
+        this.particles.emitGroup(tiles, this.container, this.tileSize, this.padding);
+
         for (const { row, col, tile } of tiles) {
             this.cells[row][col] = null;
 
-            // Animate: scale down + fade out
+            // Quick shrink so the tile disappears while particles fly
             tile.eventMode = 'none';
-            const cx = tile.x + tile.width / 2;
-            const cy = tile.y + tile.height / 2;
-            tile.anchor.set(0.5);
-            tile.x = cx;
-            tile.y = cy;
-
-            this.animateBlast(tile);
+            this.animateTileRemove(tile);
         }
     }
 
     /**
-     * Simple blast animation using the app ticker.
+     * Fast shrink + fade to remove the tile sprite (particles handle the visual punch).
      */
-    animateBlast(sprite) {
-        const duration = 15; // frames
+    animateTileRemove(sprite) {
+        const duration = 8; // frames – fast removal
         let frame = 0;
+
+        const cx = sprite.x + sprite.width / 2;
+        const cy = sprite.y + sprite.height / 2;
+        sprite.anchor.set(0.5);
+        sprite.x = cx;
+        sprite.y = cy;
 
         const tick = () => {
             frame++;

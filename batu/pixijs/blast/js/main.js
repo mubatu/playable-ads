@@ -1,4 +1,5 @@
 import { Grid } from './grid.js';
+import { ParticleSystem } from './particles.js';
 
 (async () => {
     const app = new PIXI.Application();
@@ -11,7 +12,8 @@ import { Grid } from './grid.js';
 
     document.body.appendChild(app.canvas);
 
-    const grid = new Grid(app);
+    const particles = new ParticleSystem(app);
+    const grid = new Grid(app, particles);
     await grid.loadTextures();
     grid.build();
 
