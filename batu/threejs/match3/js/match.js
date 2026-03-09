@@ -5,13 +5,137 @@
         return row + ':' + col;
     }
 
-    function collectLineSeeds(board, seedMap) {
+    function addCells(matchMap, cells) {
+        for (var i = 0; i < cells.length; i += 1) {
+            var row = cells[i].row;
+            var col = cells[i].col;
+            matchMap[toKey(row, col)] = {
+                row: row,
+                col: col
+            };
+        }
+    }
+
+    function getPatternColor(board, cells) {
+        if (cells.length === 0) {
+            return -1;
+        }
+
+        var color = board.getColor(cells[0].row, cells[0].col);
+        if (color < 0) {
+            return -1;
+        }
+
+        for (var i = 1; i < cells.length; i += 1) {
+            if (board.getColor(cells[i].row, cells[i].col) !== color) {
+                return -1;
+            }
+        }
+
+        return color;
+    }
+
+    function tryMatchPattern(board, cells, matchMap) {
+        if (getPatternColor(board, cells) >= 0) {
+            addCells(matchMap, cells);
+        }
+    }
+
+    function detectSquareMatches(board, matchMap) {
         var rows = board.getRows();
         var cols = board.getCols();
 
-        for (var row = 0; row < rows; row += 1) {
-            var col = 0;
+        for (var row = 0; row < rows - 1; row += 1) {
+            for (var col = 0; col < cols - 1; col += 1) {
+                tryMatchPattern(board, [
+                    { row: row, col: col },
+                    { row: row, col: col + 1 },
+                    { row: row + 1, col: col },
+                    { row: row + 1, col: col + 1 }
+                ], matchMap);
+            }
+        }
+    }
 
+    function detectLMatches(board, matchMap) {
+        var rows = board.getRows();
+        var cols = board.getCols();
+
+        for (var row = 0; row < rows - 2; row += 1) {
+            for (var col = 0; col < cols - 2; col += 1) {
+                // L-right:
+                // xxx
+                //   x
+                //   x
+                tryMatchPattern(board, [
+                    { row: row, col: col },
+                    { row: row, col: col + 1 },
+                    { row: row, col: col + 2 },
+                    { row: row + 1, col: col + 2 },
+                    { row: row + 2, col: col + 2 }
+                ], matchMap);
+
+                // L-left:
+                // xxx
+                // x
+                // x
+                tryMatchPattern(board, [
+                    { row: row, col: col },
+                    { row: row, col: col + 1 },
+                    { row: row, col: col + 2 },
+                    { row: row + 1, col: col },
+                    { row: row + 2, col: col }
+                ], matchMap);
+            }
+        }
+    }
+
+    function detectTMatches(board, matchMap) {
+        var rows = board.getRows();
+        var cols = board.getCols();
+
+        for (var row = 0; row < rows - 3; row += 1) {
+            for (var col = 0; col < cols - 2; col += 1) {
+                // T-left:
+                // x
+                // xxx
+                // x
+                // x
+                tryMatchPattern(board, [
+                    { row: row, col: col },
+                    { row: row + 1, col: col },
+                    { row: row + 1, col: col + 1 },
+                    { row: row + 1, col: col + 2 },
+                    { row: row + 2, col: col },
+                    { row: row + 3, col: col }
+                ], matchMap);
+
+                // T-right:
+                //   x
+                // xxx
+                //   x
+                //   x
+                tryMatchPattern(board, [
+                    { row: row, col: col + 2 },
+                    { row: row + 1, col: col },
+                    { row: row + 1, col: col + 1 },
+                    { row: row + 1, col: col + 2 },
+                    { row: row + 2, col: col + 2 },
+                    { row: row + 3, col: col + 2 }
+                ], matchMap);
+            }
+        }
+    }
+
+    function detectLinePatterns(board) {
+        var rows = board.getRows();
+        var cols = board.getCols();
+        var patterns = [];
+        var row;
+        var col;
+
+        for (row = 0; row < rows; row += 1) {
+            col = 0;
             while (col < cols) {
                 var color = board.getColor(row, col);
                 if (color < 0) {
@@ -19,89 +143,104 @@
                     continue;
                 }
 
-                var endCol = col + 1;
-                while (endCol < cols && board.getColor(row, endCol) === color) {
+                var endCol = col;
+                while (endCol + 1 < cols && board.getColor(row, endCol + 1) === color) {
                     endCol += 1;
                 }
 
-                if (endCol - col >= 3) {
-                    for (var x = col; x < endCol; x += 1) {
-                        seedMap[toKey(row, x)] = true;
+                var runLength = endCol - col + 1;
+                if (runLength >= 3 && runLength <= 5) {
+                    var horizontalPattern = [];
+                    for (var markCol = col; markCol <= endCol; markCol += 1) {
+                        horizontalPattern.push({
+                            row: row,
+                            col: markCol
+                        });
                     }
+                    patterns.push(horizontalPattern);
                 }
 
-                col = endCol;
+                col = endCol + 1;
             }
         }
 
-        for (var colIndex = 0; colIndex < cols; colIndex += 1) {
-            var rowIndex = 0;
-
-            while (rowIndex < rows) {
-                var verticalColor = board.getColor(rowIndex, colIndex);
+        for (col = 0; col < cols; col += 1) {
+            row = 0;
+            while (row < rows) {
+                var verticalColor = board.getColor(row, col);
                 if (verticalColor < 0) {
-                    rowIndex += 1;
+                    row += 1;
                     continue;
                 }
 
-                var endRow = rowIndex + 1;
-                while (endRow < rows && board.getColor(endRow, colIndex) === verticalColor) {
+                var endRow = row;
+                while (endRow + 1 < rows && board.getColor(endRow + 1, col) === verticalColor) {
                     endRow += 1;
                 }
 
-                if (endRow - rowIndex >= 3) {
-                    for (var y = rowIndex; y < endRow; y += 1) {
-                        seedMap[toKey(y, colIndex)] = true;
+                var verticalLength = endRow - row + 1;
+                if (verticalLength >= 3 && verticalLength <= 5) {
+                    var verticalPattern = [];
+                    for (var markRow = row; markRow <= endRow; markRow += 1) {
+                        verticalPattern.push({
+                            row: markRow,
+                            col: col
+                        });
                     }
+                    patterns.push(verticalPattern);
                 }
 
-                rowIndex = endRow;
+                row = endRow + 1;
             }
         }
-    }
 
-    function collectSquareSeeds(board, seedMap) {
-        var rows = board.getRows();
-        var cols = board.getCols();
-
-        for (var row = 0; row < rows - 1; row += 1) {
-            for (var col = 0; col < cols - 1; col += 1) {
-                var color = board.getColor(row, col);
-                if (color < 0) {
-                    continue;
-                }
-
-                if (
-                    board.getColor(row, col + 1) === color &&
-                    board.getColor(row + 1, col) === color &&
-                    board.getColor(row + 1, col + 1) === color
-                ) {
-                    seedMap[toKey(row, col)] = true;
-                    seedMap[toKey(row, col + 1)] = true;
-                    seedMap[toKey(row + 1, col)] = true;
-                    seedMap[toKey(row + 1, col + 1)] = true;
-                }
-            }
-        }
+        return patterns;
     }
 
     function findMatches(board) {
-        var rows = board.getRows();
-        var cols = board.getCols();
-        var seedMap = {};
+        var matchMap = {};
+        var specialMatchMap = {};
         var matchedCells = [];
+        var linePatterns = [];
+        var lineIndex;
 
-        collectLineSeeds(board, seedMap);
-        collectSquareSeeds(board, seedMap);
+        detectSquareMatches(board, specialMatchMap);
+        detectLMatches(board, specialMatchMap);
+        detectTMatches(board, specialMatchMap);
 
-        for (var row = 0; row < rows; row += 1) {
-            for (var col = 0; col < cols; col += 1) {
-                if (seedMap[toKey(row, col)]) {
-                    matchedCells.push({
-                        row: row,
-                        col: col
-                    });
+        for (var specialKey in specialMatchMap) {
+            if (Object.prototype.hasOwnProperty.call(specialMatchMap, specialKey)) {
+                matchMap[specialKey] = specialMatchMap[specialKey];
+            }
+        }
+
+        linePatterns = detectLinePatterns(board);
+        for (lineIndex = 0; lineIndex < linePatterns.length; lineIndex += 1) {
+            var pattern = linePatterns[lineIndex];
+            var overlapWithSpecial = 0;
+            var extraOutsideSpecial = 0;
+
+            for (var patternCellIndex = 0; patternCellIndex < pattern.length; patternCellIndex += 1) {
+                var patternCell = pattern[patternCellIndex];
+                var key = toKey(patternCell.row, patternCell.col);
+
+                if (specialMatchMap[key]) {
+                    overlapWithSpecial += 1;
+                } else {
+                    extraOutsideSpecial += 1;
                 }
+            }
+
+            if (overlapWithSpecial >= 2 && extraOutsideSpecial > 0) {
+                continue;
+            }
+
+            addCells(matchMap, pattern);
+        }
+
+        for (var key in matchMap) {
+            if (Object.prototype.hasOwnProperty.call(matchMap, key)) {
+                matchedCells.push(matchMap[key]);
             }
         }
 
