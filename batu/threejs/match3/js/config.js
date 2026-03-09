@@ -10,6 +10,8 @@
         BOTTOM_OFFSET: 2.8,
         COLOR_TILE_SCALE: 0.9,
         SELECT_SCALE: 1.08,
+        SWIPE_TRIGGER_PX: 18,
+        SWAP_ANIMATION_MS: 180,
         WHITE_THRESHOLD: 245,
         BACKGROUND_TEXTURE: 'assets/background.png',
         FIXED_TILE_TEXTURE: 'assets/fixed-tile.png',
