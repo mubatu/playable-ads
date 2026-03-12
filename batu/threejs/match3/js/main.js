@@ -5,6 +5,7 @@
     var gameScene = window.GameScene;
     var gameBoard = window.GameBoard;
     var gameMatch = window.GameMatch;
+    var gameWater = window.GameWater;
 
     var raycaster = new THREE.Raycaster();
     var pointer = new THREE.Vector2();
@@ -257,8 +258,16 @@
         gameScene.updateCamera(boardSize.width, boardSize.height);
     }
 
+    var lastTime = performance.now();
+
     function animate() {
         requestAnimationFrame(animate);
+        var now = performance.now();
+        var delta = (now - lastTime) / 1000;
+        lastTime = now;
+        if (delta > 0.1) delta = 0.1;
+
+        gameWater.update(delta);
         gameScene.renderer.render(gameScene.scene, gameScene.camera);
     }
 
@@ -271,6 +280,7 @@
     gameBoard.init(gameScene.scene, function () {
         var boardSize = gameBoard.getBoardSize();
         gameScene.updateCamera(boardSize.width, boardSize.height);
+        gameWater.init(gameScene.scene);
         animate();
     });
 })(window);

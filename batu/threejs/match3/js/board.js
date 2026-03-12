@@ -19,6 +19,15 @@
     var colorTileMaterials = [];
     var grid = [];
     var colorMeshes = [];
+    var waterGrid = [];
+    var waterBodyMesh = null;
+    var boardTopY = boardHeight * 0.5 - config.BOTTOM_OFFSET;
+    var waterBodyMaterial = new THREE.MeshBasicMaterial({
+        color: config.WATER_COLOR,
+        transparent: true,
+        opacity: config.WATER_CELL_OPACITY,
+        depthWrite: false
+    });
 
     function createTextureWithTransparentWhite(image, threshold) {
         var canvas = document.createElement('canvas');
@@ -242,10 +251,12 @@
     function buildBoard() {
         grid = [];
         colorMeshes = [];
+        waterGrid = [];
         var initialColors = generateSafeInitialColors();
 
         for (var row = 0; row < config.ROWS; row += 1) {
             grid[row] = [];
+            waterGrid[row] = [];
 
             for (var col = 0; col < config.COLS; col += 1) {
                 var position = getTilePosition(row, col);
@@ -270,6 +281,7 @@
                     colorMesh: colorTile
                 };
 
+                waterGrid[row][col] = false;
                 colorMeshes.push(colorTile);
             }
         }
@@ -379,6 +391,142 @@
         setCellColor(cellB.row, cellB.col, firstColor);
     }
 
+    function propagateWater() {
+        var pq = [];
+        var dist = [];
+        var r, c;
+
+        for (r = 0; r < config.ROWS; r += 1) {
+            dist[r] = [];
+            for (c = 0; c < config.COLS; c += 1) {
+                dist[r][c] = Infinity;
+            }
+        }
+
+        var fillOrder = [];
+        var entryCols = config.WATER_ENTRY_COLS;
+
+        for (var e = 0; e < entryCols.length; e += 1) {
+            var ec = entryCols[e];
+            if (ec >= 0 && ec < config.COLS && grid[0][ec].colorIndex < 0) {
+                dist[0][ec] = 0;
+                pq.push({ row: 0, col: ec, d: 0 });
+            }
+        }
+
+        while (pq.length > 0) {
+            var minIdx = 0;
+            for (var i = 1; i < pq.length; i += 1) {
+                if (pq[i].d < pq[minIdx].d) { minIdx = i; }
+            }
+            var cur = pq.splice(minIdx, 1)[0];
+
+            if (cur.d > dist[cur.row][cur.col]) { continue; }
+
+            if (!waterGrid[cur.row][cur.col]) {
+                fillOrder.push(cur);
+            }
+
+            var neighbors = [
+                { row: cur.row + 1, col: cur.col, cost: 1 },
+                { row: cur.row, col: cur.col - 1, cost: 2 },
+                { row: cur.row, col: cur.col + 1, cost: 2 },
+                { row: cur.row - 1, col: cur.col, cost: 3 }
+            ];
+
+            for (var n = 0; n < neighbors.length; n += 1) {
+                var nr = neighbors[n].row;
+                var nc = neighbors[n].col;
+                var nd = cur.d + neighbors[n].cost;
+
+                if (nr < 0 || nr >= config.ROWS || nc < 0 || nc >= config.COLS) { continue; }
+                if (grid[nr][nc].colorIndex >= 0) { continue; }
+                if (nd >= dist[nr][nc]) { continue; }
+
+                dist[nr][nc] = nd;
+                pq.push({ row: nr, col: nc, d: nd });
+            }
+        }
+
+        var delayMs = config.WATER_FILL_DELAY_MS;
+        for (var f = 0; f < fillOrder.length; f += 1) {
+            (function (item) {
+                setTimeout(function () {
+                    waterGrid[item.row][item.col] = true;
+                    rebuildWaterBody();
+                    window.GameWater.drainVolume(config.WATER_CELL_VOLUME);
+                }, item.d * delayMs);
+            })(fillOrder[f]);
+        }
+    }
+
+    function rebuildWaterBody() {
+        if (waterBodyMesh) {
+            scene.remove(waterBodyMesh);
+            waterBodyMesh.geometry.dispose();
+            waterBodyMesh = null;
+        }
+
+        var step = config.TILE_SIZE + config.TILE_GAP;
+        var quads = [];
+
+        for (var col = 0; col < config.COLS; col += 1) {
+            var runStart = -1;
+
+            for (var row = 0; row <= config.ROWS; row += 1) {
+                var isWater = row < config.ROWS && waterGrid[row] && waterGrid[row][col];
+
+                if (isWater && runStart < 0) {
+                    runStart = row;
+                }
+
+                if (!isWater && runStart >= 0) {
+                    var topPos = getTilePosition(runStart, col);
+                    var botPos = getTilePosition(row - 1, col);
+
+                    var top = topPos.y + config.TILE_SIZE * 0.5;
+                    var bottom = botPos.y - config.TILE_SIZE * 0.5;
+
+                    if (runStart === 0) {
+                        top = boardTopY;
+                    }
+
+                    var cx = topPos.x;
+                    var left = cx - step * 0.5;
+                    var right = cx + step * 0.5;
+
+                    quads.push({ top: top, bottom: bottom, left: left, right: right });
+                    runStart = -1;
+                }
+            }
+        }
+
+        if (quads.length === 0) {
+            return;
+        }
+
+        var vertexCount = quads.length * 6;
+        var positions = new Float32Array(vertexCount * 3);
+        var idx = 0;
+
+        for (var q = 0; q < quads.length; q += 1) {
+            var quad = quads[q];
+            positions[idx++] = quad.left;  positions[idx++] = quad.top;    positions[idx++] = 0;
+            positions[idx++] = quad.left;  positions[idx++] = quad.bottom; positions[idx++] = 0;
+            positions[idx++] = quad.right; positions[idx++] = quad.top;    positions[idx++] = 0;
+            positions[idx++] = quad.right; positions[idx++] = quad.top;    positions[idx++] = 0;
+            positions[idx++] = quad.left;  positions[idx++] = quad.bottom; positions[idx++] = 0;
+            positions[idx++] = quad.right; positions[idx++] = quad.bottom; positions[idx++] = 0;
+        }
+
+        var geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        waterBodyMesh = new THREE.Mesh(geometry, waterBodyMaterial);
+        waterBodyMesh.position.z = 0.04;
+        scene.add(waterBodyMesh);
+    }
+
     function removeCells(cells) {
         for (var i = 0; i < cells.length; i += 1) {
             var row = cells[i].row;
@@ -391,6 +539,8 @@
                 cell.fixedMesh.visible = false;
             }
         }
+
+        propagateWater();
     }
 
     window.GameBoard = {
