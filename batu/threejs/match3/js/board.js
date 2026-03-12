@@ -388,6 +388,7 @@
             if (cell && cell.colorIndex >= 0) {
                 cell.colorMesh.scale.set(1, 1, 1);
                 setCellColor(row, col, -1);
+                cell.fixedMesh.visible = false;
             }
         }
     }
