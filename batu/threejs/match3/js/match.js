@@ -41,23 +41,45 @@
         }
     }
 
-    function detectSquareMatches(board, matchMap) {
+    function hasBlockedCell(cells, blockedMap) {
+        if (!blockedMap) {
+            return false;
+        }
+
+        for (var i = 0; i < cells.length; i += 1) {
+            if (blockedMap[toKey(cells[i].row, cells[i].col)]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function tryMatchPatternWithPriority(board, cells, matchMap, blockedMap) {
+        if (hasBlockedCell(cells, blockedMap)) {
+            return;
+        }
+
+        tryMatchPattern(board, cells, matchMap);
+    }
+
+    function detectSquareMatches(board, matchMap, blockedMap) {
         var rows = board.getRows();
         var cols = board.getCols();
 
         for (var row = 0; row < rows - 1; row += 1) {
             for (var col = 0; col < cols - 1; col += 1) {
-                tryMatchPattern(board, [
+                tryMatchPatternWithPriority(board, [
                     { row: row, col: col },
                     { row: row, col: col + 1 },
                     { row: row + 1, col: col },
                     { row: row + 1, col: col + 1 }
-                ], matchMap);
+                ], matchMap, blockedMap);
             }
         }
     }
 
-    function detectLMatches(board, matchMap) {
+    function detectLMatches(board, matchMap, blockedMap) {
         var rows = board.getRows();
         var cols = board.getCols();
 
@@ -67,30 +89,30 @@
                 // xxx
                 //   x
                 //   x
-                tryMatchPattern(board, [
+                tryMatchPatternWithPriority(board, [
                     { row: row, col: col },
                     { row: row, col: col + 1 },
                     { row: row, col: col + 2 },
                     { row: row + 1, col: col + 2 },
                     { row: row + 2, col: col + 2 }
-                ], matchMap);
+                ], matchMap, blockedMap);
 
                 // L-left:
                 // xxx
                 // x
                 // x
-                tryMatchPattern(board, [
+                tryMatchPatternWithPriority(board, [
                     { row: row, col: col },
                     { row: row, col: col + 1 },
                     { row: row, col: col + 2 },
                     { row: row + 1, col: col },
                     { row: row + 2, col: col }
-                ], matchMap);
+                ], matchMap, blockedMap);
             }
         }
     }
 
-    function detectTMatches(board, matchMap) {
+    function detectTMatches(board, matchMap, blockedMap) {
         var rows = board.getRows();
         var cols = board.getCols();
 
@@ -101,28 +123,28 @@
                 // xxx
                 // x
                 // x
-                tryMatchPattern(board, [
+                tryMatchPatternWithPriority(board, [
                     { row: row, col: col },
                     { row: row + 1, col: col },
                     { row: row + 1, col: col + 1 },
                     { row: row + 1, col: col + 2 },
                     { row: row + 2, col: col },
                     { row: row + 3, col: col }
-                ], matchMap);
+                ], matchMap, blockedMap);
 
                 // T-right:
                 //   x
                 // xxx
                 //   x
                 //   x
-                tryMatchPattern(board, [
+                tryMatchPatternWithPriority(board, [
                     { row: row, col: col + 2 },
                     { row: row + 1, col: col },
                     { row: row + 1, col: col + 1 },
                     { row: row + 1, col: col + 2 },
                     { row: row + 2, col: col + 2 },
                     { row: row + 3, col: col + 2 }
-                ], matchMap);
+                ], matchMap, blockedMap);
             }
         }
     }
@@ -204,9 +226,13 @@
         var linePatterns = [];
         var lineIndex;
 
-        detectSquareMatches(board, specialMatchMap);
-        detectLMatches(board, specialMatchMap);
-        detectTMatches(board, specialMatchMap);
+        // Pattern precedence:
+        // 1. T
+        // 2. L (only where it does not overlap T)
+        // 3. Lines (filtered to avoid extra expansion around special shapes)
+        // 4. 2x2 square (only where it does not overlap already selected cells)
+        detectTMatches(board, specialMatchMap, specialMatchMap);
+        detectLMatches(board, specialMatchMap, specialMatchMap);
 
         for (var specialKey in specialMatchMap) {
             if (Object.prototype.hasOwnProperty.call(specialMatchMap, specialKey)) {
@@ -237,6 +263,8 @@
 
             addCells(matchMap, pattern);
         }
+
+        detectSquareMatches(board, matchMap, matchMap);
 
         for (var key in matchMap) {
             if (Object.prototype.hasOwnProperty.call(matchMap, key)) {
