@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Three.js Match-3 Editor</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #1a1a1a; }
+        #ui-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(30, 30, 30, 0.9);
+            color: #eee;
+            padding: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-radius: 8px;
+            width: 220px;
+            border: 1px solid #444;
+            user-select: none;
+            z-index: 10;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.8; }
+        .btn-add { background: #2196F3; color: white; }
+        .btn-random { background: #9C27B0; color: white; }
+        .btn-save { background: #4CAF50; color: white; margin-top: 10px; }
+        #asset-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 60px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .asset-thumb {
+            width: 45px;
+            height: 45px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            object-fit: cover;
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+<div id="ui-container" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 8px; width: 220px; font-family: sans-serif; max-height: 90vh; overflow-y: auto;">
+    <button id="btn-project" onclick="setProjectRoot()" style="width:100%; padding:10px; background:#FF9800; border:none; color:white; font-weight:bold; cursor:pointer;">📁 Connect Project Folder</button>
+    <p id="folder-status" style="font-size:10px; margin: 5px 0 15px 0; color:#FF9800;">Not Connected (Required after reload)</p>
+
+    <button onclick="document.getElementById('file-input').click()" style="width:100%; padding:10px; background:#2196F3; border:none; color:white; cursor:pointer;">+ Add Photo</button>
+    <input type="file" id="file-input" style="display:none" accept="image/*">
+
+    <button onclick="generateRandomLevel()" style="width:100%; padding:10px; background:#9C27B0; border:none; color:white; margin-top:5px; cursor:pointer;">🎲 Random Level</button>
+    <button onclick="clearLevel()" style="width:100%; padding:10px; background:#f44336; border:none; color:white; margin-top:5px; cursor:pointer; font-weight:bold;">
+        🗑️ Clear Level
+    </button>
+
+    <p style="font-size:12px; margin: 15px 0 5px 0;">Asset Library:</p>
+    <div id="asset-list" style="display:flex; flex-wrap:wrap; gap:5px; background:rgba(0,0,0,0.3); padding:5px; min-height:50px; border-radius:4px;"></div>
+
+    <button onclick="saveLevel()" style="width:100%; padding:10px; background:#4CAF50; border:none; color:white; margin-top:15px; font-weight:bold; cursor:pointer;">💾 Save Level JSON</button>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
