@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Three.js Hand Tutorial Module</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <section class="stage-shell">
+            <div id="scene-root" class="scene-root"></div>
+        </section>
+
+        <aside class="control-panel">
+            <div class="panel-section">
+                <div class="section-title">Gesture Setup</div>
+
+                <div class="field">
+                    <span>Built-in hands</span>
+                    <div id="asset-gallery" class="asset-gallery"></div>
+                </div>
+
+                <label class="field">
+                    <span>Custom hand upload</span>
+                    <input id="asset-input" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+                </label>
+
+                <label class="field">
+                    <span>Gesture</span>
+                    <select id="gesture">
+                        <option value="tap">Tap / Click</option>
+                        <option value="swipe">Swipe</option>
+                        <option value="drag">Drag</option>
+                        <option value="swap" selected>Swap</option>
+                    </select>
+                </label>
+
+                <label class="field">
+                    <span>Target space</span>
+                    <select id="space">
+                        <option value="world" selected>World position</option>
+                        <option value="screen">Screen position</option>
+                    </select>
+                </label>
+
+                <div class="button-row">
+                    <button id="pick-start" type="button" class="ghost-button">Pick start</button>
+                    <button id="pick-end" type="button" class="ghost-button">Pick end</button>
+                    <button id="reset-points" type="button" class="ghost-button">Reset</button>
+                </div>
+
+                <div class="readout-grid">
+                    <div class="readout-card">
+                        <span>Start</span>
+                        <strong id="start-readout"></strong>
+                    </div>
+                    <div class="readout-card">
+                        <span>End</span>
+                        <strong id="end-readout"></strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-title">Animation</div>
+
+                <label class="field field-range">
+                    <span>Duration <strong id="duration-value"></strong></span>
+                    <input id="duration" type="range" min="0.4" max="3" step="0.05" value="1.2">
+                </label>
+
+                <label class="field field-range">
+                    <span>Loop delay <strong id="loop-delay-value"></strong></span>
+                    <input id="loop-delay" type="range" min="0" max="2" step="0.05" value="0.35">
+                </label>
+
+                <label class="field field-range">
+                    <span>Size <strong id="size-value"></strong></span>
+                    <input id="size" type="range" min="72" max="220" step="2" value="144">
+                </label>
+
+                <label class="field field-range">
+                    <span>Rotation <strong id="rotation-value"></strong></span>
+                    <input id="rotation" type="range" min="-180" max="180" step="1" value="0">
+                </label>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-title">Anchor And Style</div>
+
+                <label class="field field-range">
+                    <span>Anchor X <strong id="anchor-x-value"></strong></span>
+                    <input id="anchor-x" type="range" min="0" max="1" step="0.01" value="0.22">
+                </label>
+
+                <label class="field field-range">
+                    <span>Anchor Y <strong id="anchor-y-value"></strong></span>
+                    <input id="anchor-y" type="range" min="0" max="1" step="0.01" value="0.08">
+                </label>
+
+                <label class="toggle">
+                    <input id="show-trail" type="checkbox" checked>
+                    <span>Show trail</span>
+                </label>
+
+                <label class="toggle">
+                    <input id="follow-direction" type="checkbox">
+                    <span>Follow swipe direction</span>
+                </label>
+
+                <label class="toggle">
+                    <input id="flip-x" type="checkbox">
+                    <span>Flip image horizontally</span>
+                </label>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-title">Generated Config</div>
+                <button id="copy-config" type="button" class="copy-button">Copy config</button>
+                <pre id="config-preview" class="config-preview"></pre>
+            </div>
+        </aside>
+    </div>
+
+    <script src="../blast/js/lib/three.min.js"></script>
+    <script src="js/HandTutorial.js"></script>
+    <script src="js/demo-scene.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
