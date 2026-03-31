@@ -54,22 +54,26 @@
     </style>
 </head>
 <body>
-<div id="ui-container" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 8px; width: 220px; font-family: sans-serif; max-height: 90vh; overflow-y: auto;">
-    <button id="btn-project" onclick="setProjectRoot()" style="width:100%; padding:10px; background:#FF9800; border:none; color:white; font-weight:bold; cursor:pointer;">📁 Connect Project Folder</button>
-    <p id="folder-status" style="font-size:10px; margin: 5px 0 15px 0; color:#FF9800;">Not Connected (Required after reload)</p>
+<div id="ui-container">
+    <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+        <input type="number" id="grid-width" value="10" min="1" max="50" style="width: 50%; padding: 5px;" placeholder="Width">
+        <input type="number" id="grid-height" value="6" min="1" max="50" style="width: 50%; padding: 5px;" placeholder="Height">
+    </div>
+    <button id="btn-resize" style="background: #FF9800; color: white; margin-bottom: 15px;">📐 Resize Grid</button>
 
-    <button onclick="document.getElementById('file-input').click()" style="width:100%; padding:10px; background:#2196F3; border:none; color:white; cursor:pointer;">+ Add Photo</button>
-    <input type="file" id="file-input" style="display:none" accept="image/*">
+    <button id="btn-project">📁 Connect Project Folder</button>
 
-    <button onclick="generateRandomLevel()" style="width:100%; padding:10px; background:#9C27B0; border:none; color:white; margin-top:5px; cursor:pointer;">🎲 Random Level</button>
-    <button onclick="clearLevel()" style="width:100%; padding:10px; background:#f44336; border:none; color:white; margin-top:5px; cursor:pointer; font-weight:bold;">
-        🗑️ Clear Level
-    </button>
+    <div id="folder-status" style="margin-bottom: 10px; font-size: 12px; color: #aaa;"></div>
 
-    <p style="font-size:12px; margin: 15px 0 5px 0;">Asset Library:</p>
-    <div id="asset-list" style="display:flex; flex-wrap:wrap; gap:5px; background:rgba(0,0,0,0.3); padding:5px; min-height:50px; border-radius:4px;"></div>
+    <button id="btn-add-photo" class="btn-add">+ Add Photo</button>
 
-    <button onclick="saveLevel()" style="width:100%; padding:10px; background:#4CAF50; border:none; color:white; margin-top:15px; font-weight:bold; cursor:pointer;">💾 Save Level JSON</button>
+    <input type="file" id="file-input" style="display: none;" accept="image/*">
+
+    <div id="asset-list"></div>
+
+    <button id="btn-random" class="btn-random">🎲 Random Level</button>
+    <button id="btn-clear">🗑️ Clear Level</button>
+    <button id="btn-save" class="btn-save">💾 Save Level JSON</button>
 </div>
 <script type="module" src="src/main.js"></script>
 </body>
