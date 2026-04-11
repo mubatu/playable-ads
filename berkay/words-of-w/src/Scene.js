@@ -3,7 +3,7 @@ import './css/style.css';
 import './css/word-wheel.css';
 import './components/HandTutorial.js';
 import { Timer } from './components/Timer.js';
-import { LetterWheel } from './game/word-wheel/LetterWheel.js';
+import { UIWordLetterWheel } from './UIScene/UISceneElements/UIWordLetterWheel.js';
 import { WordSlots } from './game/word-wheel/WordSlots.js';
 
 const HAND_ICON_SVG = [
@@ -110,8 +110,7 @@ export class Scene {
         this.wordSlots = new WordSlots({ container: this.hud });
         this.wordSlots.build();
 
-        this.letterWheel = new LetterWheel({
-            container: this.hud,
+        this.letterWheel = new UIWordLetterWheel({
             letters: this.level.wheelLetters,
             onSelectionStart: () => {
                 this.stopTutorial();
@@ -131,7 +130,7 @@ export class Scene {
 
                 this.handleWordAttempt(letters.join('').toUpperCase());
             }
-        });
+        }, this.hud);
         this.letterWheel.build();
 
         this.playOverlay = this.createOverlay({

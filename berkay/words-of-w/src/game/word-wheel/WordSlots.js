@@ -1,9 +1,23 @@
+import { DOMElementPool } from './DOMElementPool.js';
+import { WordUnitFactory } from './WordUnitFactory.js';
+
 export class WordSlots {
     constructor(options) {
         this.container = options.container;
         this.root = null;
         this.slotElements = [];
         this.currentWord = '';
+
+        this.slotPool = new DOMElementPool(
+            () => WordUnitFactory.createWordSlot(),
+            (slot) => {
+                slot.textContent = '';
+                slot.classList.remove('is-filled');
+                if (slot.parentNode) {
+                    slot.parentNode.removeChild(slot);
+                }
+            }
+        );
     }
 
     build() {
@@ -14,13 +28,11 @@ export class WordSlots {
 
     setWord(word) {
         this.currentWord = String(word || '').toUpperCase();
-        this.slotElements.forEach((slot) => slot.remove());
+        this.slotElements.forEach((slot) => this.slotPool.release(slot));
         this.slotElements = [];
 
         for (let i = 0; i < this.currentWord.length; i += 1) {
-            const slot = document.createElement('div');
-            slot.className = 'wow-word-slots__slot';
-            slot.textContent = '';
+            const slot = this.slotPool.acquire();
             this.root.appendChild(slot);
             this.slotElements.push(slot);
         }
@@ -50,6 +62,9 @@ export class WordSlots {
     }
 
     destroy() {
+        this.slotElements.forEach((slot) => this.slotPool.release(slot));
+        this.slotElements = [];
+
         if (this.root && this.root.parentNode) {
             this.root.parentNode.removeChild(this.root);
         }
