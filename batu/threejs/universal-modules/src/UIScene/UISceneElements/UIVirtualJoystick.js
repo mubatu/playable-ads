@@ -1,6 +1,6 @@
 // ui-joystick.js
 import { UISceneElement } from './UISceneElement.js';
-import { MoveCommand } from '../../Command/MoveCommand';
+import { MoveCommand } from '../../Command/MoveCommand.js';
 
 export class UIVirtualJoystick extends UISceneElement {
     constructor(config, container) {

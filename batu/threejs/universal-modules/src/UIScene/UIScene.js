@@ -1,6 +1,6 @@
 // ui-scene.js
 import { UIButton } from './UISceneElements/UIButton.js';
-import { UIVirtualJoystick } from './UISceneElements/UIVirtualJoystick';
+import { UIVirtualJoystick } from './UISceneElements/UIVirtualJoystick.js';
 import { UISlider } from './UISceneElements/UISlider.js';
 import { UIToggle } from './UISceneElements/UIToggle.js';
 import { UIProgressBar } from './UISceneElements/UIProgressBar.js';

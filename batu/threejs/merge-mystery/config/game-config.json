@@ -28,5 +28,26 @@
         "dragScale": 1.08,
         "baseZ": 0.2,
         "dragZ": 0.45
+    },
+    "tutorial": {
+        "enabled": true,
+        "assetUrl": "../hand-tutorial/assets/hand-2.png",
+        "gesture": "drag",
+        "size": 132,
+        "duration": 1.1,
+        "loopDelay": 0.4,
+        "startDelayMs": 450,
+        "from": {
+            "space": "grid",
+            "row": 0,
+            "column": 0,
+            "z": 0.2
+        },
+        "to": {
+            "space": "grid",
+            "row": 0,
+            "column": 1,
+            "z": 0.2
+        }
     }
 }

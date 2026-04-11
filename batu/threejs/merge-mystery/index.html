@@ -11,6 +11,14 @@
     <div id="error-banner" hidden></div>
 
     <script src="../match3/js/lib/three.min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="../universal-modules/src/UIScene/HandTutorial.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./js/lib/three-global-module.js"
+            }
+        }
+    </script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
