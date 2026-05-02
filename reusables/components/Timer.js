@@ -21,6 +21,7 @@ export class Timer {
         this.element.style.transform = 'translateX(-50%)';
         this.element.style.zIndex = '100';
         this.element.style.userSelect = 'none';
+        this.element.style.pointerEvents = 'none';
 
         if (this.type === 'linear') {
             this.element.style.width = '200px';

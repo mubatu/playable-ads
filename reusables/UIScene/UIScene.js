@@ -1,11 +1,15 @@
 // ui-scene.js
 import { UIButton } from './UISceneElements/UIButton.js';
 import { UIVirtualJoystick } from './UISceneElements/UIVirtualJoystick';
+import { UIIntroOverlay } from './UISceneElements/UIIntroOverlay.js';
+import { UIDeployBadge } from './UISceneElements/UIDeployBadge.js';
 
 // Factory Map: Links config types to classes
 const UI_ELEMENT_MAP = {
     'buttons': UIButton,
-    'joysticks': UIVirtualJoystick
+    'joysticks': UIVirtualJoystick,
+    'introOverlays': UIIntroOverlay,
+    'deployBadges': UIDeployBadge
 };
 
 export class UIScene {
@@ -24,6 +28,20 @@ export class UIScene {
 
         document.body.appendChild(this.container);
         this.buildUI();
+    }
+
+    /**
+     * @param {string} id - matches `config.id` on a built element
+     * @returns {UISceneElement|null}
+     */
+    getByConfigId(id) {
+        for (let i = 0; i < this.uiElements.length; i += 1) {
+            const el = this.uiElements[i];
+            if (el.config && el.config.id === id) {
+                return el;
+            }
+        }
+        return null;
     }
 
     buildUI() {
