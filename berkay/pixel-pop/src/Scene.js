@@ -92,6 +92,9 @@ export class PixelPopScene {
         this.queueSystem = null;
         this.hud = null;
         this.handTutorial = null;
+        this.queueTutorialShown = false;
+        this.bucketTutorialShown = false;
+        this.activeTutorialMode = null;
 
         this.activeRuns = [];
         this.gameState = 'playing';
@@ -250,35 +253,7 @@ export class PixelPopScene {
     }
 
     setupTutorial() {
-        const firstShooter = this.queueSystem.getFrontShooter();
-
-        if (!firstShooter || !window.HandTutorial) {
-            return;
-        }
-
-        const handUrl = `data:image/svg+xml;utf8,${encodeURIComponent(HAND_ICON_SVG)}`;
-        const projected = firstShooter.position.clone().project(this.camera);
-        const screenPoint = {
-            space: 'screen',
-            x: projected.x * 0.5 + 0.5,
-            y: (-projected.y * 0.5) + 0.5
-        };
-
-        this.handTutorial = new window.HandTutorial({
-            container: document.body,
-            renderer: this.renderer,
-            camera: this.camera,
-            assetUrl: handUrl,
-            gesture: 'tap',
-            from: screenPoint,
-            duration: 1.2,
-            loop: true,
-            zIndex: 12,
-            size: 136,
-            opacity: 0.95
-        });
-
-        this.handTutorial.play();
+        this.showQueueTutorial();
     }
 
     bindEvents() {
@@ -296,8 +271,6 @@ export class PixelPopScene {
         if (this.gameState !== 'playing') {
             return;
         }
-
-        this.stopTutorial();
 
         const rect = this.renderer.domElement.getBoundingClientRect();
         this.pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -333,6 +306,16 @@ export class PixelPopScene {
 
         if (!removed) {
             return;
+        }
+
+        if (removed.source === 'queue') {
+            this.queueTutorialShown = true;
+            if (this.activeTutorialMode === 'queue') {
+                this.stopTutorial();
+            }
+        } else if (removed.source === 'bucket' && this.activeTutorialMode === 'bucket') {
+            this.bucketTutorialShown = true;
+            this.stopTutorial();
         }
 
         const launchDistance = this.path.distanceAtBottomX(shooter.position.x);
@@ -442,6 +425,10 @@ export class PixelPopScene {
             this.queueSystem.layout();
             this.hud.setBucket(this.queueSystem.bucketCount, this.queueSystem.bucketSize);
             this.hud.setQueueInfo(this.queueSystem.getQueueCounts());
+
+            if (!this.bucketTutorialShown && this.queueSystem.bucketSlots.length > 0) {
+                this.showBucketTutorial();
+            }
             return;
         }
 
@@ -455,12 +442,66 @@ export class PixelPopScene {
         }
     }
 
+    showHandTutorialForShooter(shooter, mode) {
+        if (!shooter || !window.HandTutorial) {
+            return;
+        }
+
+        const handUrl = `data:image/svg+xml;utf8,${encodeURIComponent(HAND_ICON_SVG)}`;
+        const projected = shooter.position.clone().project(this.camera);
+        const screenPoint = {
+            space: 'screen',
+            x: projected.x * 0.5 + 0.5,
+            y: (-projected.y * 0.5) + 0.5
+        };
+
+        this.stopTutorial();
+        this.activeTutorialMode = mode;
+
+        this.handTutorial = new window.HandTutorial({
+            container: document.body,
+            renderer: this.renderer,
+            camera: this.camera,
+            assetUrl: handUrl,
+            gesture: 'tap',
+            from: screenPoint,
+            duration: 1.2,
+            loop: true,
+            zIndex: 12,
+            size: 136,
+            opacity: 0.95
+        });
+
+        this.handTutorial.play();
+    }
+
+    showQueueTutorial() {
+        if (this.queueTutorialShown) {
+            return;
+        }
+
+        const firstQueueHitArea = this.queueSystem.queueSlots[0]?.hitArea || null;
+        this.showHandTutorialForShooter(firstQueueHitArea, 'queue');
+    }
+
+    showBucketTutorial() {
+        if (this.bucketTutorialShown) {
+            return;
+        }
+
+        const firstBucketShooter = this.queueSystem.bucketSlots[0] || null;
+        this.bucketTutorialShown = Boolean(firstBucketShooter);
+        this.showHandTutorialForShooter(firstBucketShooter, 'bucket');
+    }
+
     stopTutorial() {
         if (this.handTutorial) {
             this.handTutorial.stop();
             this.handTutorial.destroy();
             this.handTutorial = null;
         }
+
+        this.activeTutorialMode = null;
     }
 
     endGame(isWin, reason = '') {
@@ -502,6 +543,10 @@ export class PixelPopScene {
         } else {
             this.grid.update(delta);
             BulletFactory.update(this.bulletPool, delta);
+        }
+
+        if (this.handTutorial && this.gameState === 'playing') {
+            this.handTutorial.update(performance.now());
         }
 
         this.renderer.render(this.scene, this.camera);

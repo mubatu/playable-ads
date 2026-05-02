@@ -22,6 +22,7 @@ export class ShooterQueueSystem {
         this.group = new THREE.Group();
         this.queueSlots = [];
         this.bucketSlots = [];
+        this.queueHitAreas = [];
         this.queueWidth = 3.55;
         this.queueStep = 0.9;
         this.bucketStep = 1.05;
@@ -48,13 +49,31 @@ export class ShooterQueueSystem {
             rack.position.set(x, this.queueAnchorY + 1.08, 0.03);
             this.group.add(rack);
 
+            const queueHitArea = new THREE.Mesh(
+                new THREE.PlaneGeometry(2.5, 3.35),
+                new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.001,
+                    depthWrite: false
+                })
+            );
+            queueHitArea.position.set(x, this.queueAnchorY + 0.98, 0.07);
+            queueHitArea.userData = {
+                type: 'queue-hit-area',
+                queueIndex
+            };
+            this.group.add(queueHitArea);
+
             const queue = {
                 index: queueIndex,
                 x,
-                items: []
+                items: [],
+                hitArea: queueHitArea
             };
 
             this.queueSlots.push(queue);
+            this.queueHitAreas.push(queueHitArea);
         }
 
         const bucketPanel = createPanel(1.95, 4.45, 0x0f1b33, 0.72);
@@ -156,16 +175,7 @@ export class ShooterQueueSystem {
         const meshes = [];
 
         for (let index = 0; index < this.queueSlots.length; index += 1) {
-            const front = this.queueSlots[index].items[0];
-
-            if (front) {
-                front.userData.interactive = true;
-                meshes.push(front);
-            }
-
-            for (let slotIndex = 1; slotIndex < this.queueSlots[index].items.length; slotIndex += 1) {
-                this.queueSlots[index].items[slotIndex].userData.interactive = false;
-            }
+            meshes.push(this.queueSlots[index].hitArea);
         }
 
         for (let index = 0; index < this.bucketSlots.length; index += 1) {
@@ -177,7 +187,16 @@ export class ShooterQueueSystem {
     }
 
     resolveMesh(mesh) {
-        return mesh?.parent && mesh.parent.userData && typeof mesh.parent.userData.bulletsRemaining === 'number' ? mesh.parent : mesh;
+        if (!mesh) {
+            return null;
+        }
+
+        if (mesh.userData && mesh.userData.type === 'queue-hit-area') {
+            const queue = this.queueSlots[mesh.userData.queueIndex];
+            return queue ? queue.items[0] || null : null;
+        }
+
+        return mesh.parent && mesh.parent.userData && typeof mesh.parent.userData.bulletsRemaining === 'number' ? mesh.parent : mesh;
     }
 
     layout() {
@@ -190,7 +209,6 @@ export class ShooterQueueSystem {
                 shooter.position.set(queue.x, this.queueAnchorY + topOffset, 0.2 + slotIndex * 0.06);
                 shooter.scale.setScalar(1 - slotIndex * 0.06);
                 shooter.rotation.z = 0;
-                shooter.userData.interactive = slotIndex === 0;
                 shooter.userData.queueIndex = queueIndex;
                 shooter.userData.slotIndex = slotIndex;
                 shooter.userData.slotType = 'queue';
