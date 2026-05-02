@@ -39,14 +39,14 @@
         "startDelayMs": 450,
         "from": {
             "space": "grid",
-            "row": 0,
-            "column": 0,
+            "row": 2,
+            "column": 2,
             "z": 0.2
         },
         "to": {
             "space": "grid",
-            "row": 0,
-            "column": 1,
+            "row": 3,
+            "column": 3,
             "z": 0.2
         }
     }

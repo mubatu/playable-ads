@@ -378,42 +378,42 @@ function emitMergeParticles(state, row, column, tier) {
     particleCount = 8;
 
     for (index = 0; index < particleCount; index += 1) {
-        var particle = state.particlePool.get();
-        var angle = (Math.PI * 2 * index) / particleCount + (Math.random() * 0.35);
-        var speed = 1.5 + (Math.random() * 1.2);
-        var maxLife = 0.24 + (Math.random() * 0.2);
-        var baseScale = 0.5 + (Math.random() * 0.4);
+        const activeParticle = state.particlePool.get();
+        const angle = (Math.PI * 2 * index) / particleCount + (Math.random() * 0.35);
+        const speed = 1.5 + (Math.random() * 1.2);
+        const maxLife = 0.24 + (Math.random() * 0.2);
+        const baseScale = 0.5 + (Math.random() * 0.4);
 
-        particle.position.copy(centerWorld);
-        particle.position.x += (Math.random() - 0.5) * 0.08;
-        particle.position.y += (Math.random() - 0.5) * 0.08;
-        particle.position.z = 0.6;
-        particle.visible = true;
-        particle.material.color.set(MERGE_PARTICLE_COLORS[Math.min(tier - 1, MERGE_PARTICLE_COLORS.length - 1)]);
-        particle.material.opacity = 0.88;
-        particle.userData.velocity.set(Math.cos(angle) * speed, Math.sin(angle) * speed, 0);
-        particle.userData.life = maxLife;
-        particle.userData.maxLife = maxLife;
-        particle.userData.baseScale = baseScale;
-        particle.scale.setScalar(baseScale);
-        particle.update = function (delta) {
-            var progress;
+        activeParticle.position.copy(centerWorld);
+        activeParticle.position.x += (Math.random() - 0.5) * 0.08;
+        activeParticle.position.y += (Math.random() - 0.5) * 0.08;
+        activeParticle.position.z = 0.6;
+        activeParticle.visible = true;
+        activeParticle.material.color.set(MERGE_PARTICLE_COLORS[Math.min(tier - 1, MERGE_PARTICLE_COLORS.length - 1)]);
+        activeParticle.material.opacity = 0.88;
+        activeParticle.userData.velocity.set(Math.cos(angle) * speed, Math.sin(angle) * speed, 0);
+        activeParticle.userData.life = maxLife;
+        activeParticle.userData.maxLife = maxLife;
+        activeParticle.userData.baseScale = baseScale;
+        activeParticle.scale.setScalar(baseScale);
+        activeParticle.update = function (delta) {
+            let progress;
 
-            particle.userData.life -= delta;
+            activeParticle.userData.life -= delta;
 
-            if (particle.userData.life <= 0) {
-                releaseParticle(state, particle);
+            if (activeParticle.userData.life <= 0) {
+                releaseParticle(state, activeParticle);
                 return;
             }
 
-            progress = 1 - (particle.userData.life / particle.userData.maxLife);
-            particle.position.addScaledVector(particle.userData.velocity, delta);
-            particle.material.opacity = (1 - progress) * 0.88;
-            particle.scale.setScalar(particle.userData.baseScale * (1 + (progress * 0.9)));
+            progress = 1 - (activeParticle.userData.life / activeParticle.userData.maxLife);
+            activeParticle.position.addScaledVector(activeParticle.userData.velocity, delta);
+            activeParticle.material.opacity = (1 - progress) * 0.88;
+            activeParticle.scale.setScalar(activeParticle.userData.baseScale * (1 + (progress * 0.9)));
         };
 
-        state.activeParticles.add(particle);
-        state.sceneManager.addObject(particle);
+        state.activeParticles.add(activeParticle);
+        state.sceneManager.addObject(activeParticle);
     }
 }
 
