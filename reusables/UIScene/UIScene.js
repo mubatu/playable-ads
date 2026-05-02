@@ -1,11 +1,13 @@
 // ui-scene.js
 import { UIButton } from './UISceneElements/UIButton.js';
-import { UIVirtualJoystick } from './UISceneElements/UIVirtualJoystick';
+import { UIProgressBar } from './UISceneElements/UIProgressBar.js';
+import { UIToggle } from './UISceneElements/UIToggle.js';
 
 // Factory Map: Links config types to classes
 const UI_ELEMENT_MAP = {
     'buttons': UIButton,
-    'joysticks': UIVirtualJoystick
+    'progressBars': UIProgressBar,
+    'toggles': UIToggle
 };
 
 export class UIScene {
