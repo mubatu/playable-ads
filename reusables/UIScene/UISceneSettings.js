@@ -32,6 +32,68 @@ export function getCocPlayableUIConfig(barbarianStock) {
     };
 }
 
+/** Royale-style intro + elixir bar + bottom card hand. Merge into `UIScene` settings. */
+export function getRoyalePlayableUIConfig(options = {}) {
+    const {
+        onPrimaryClick,
+        onCardActivate,
+        cardItems,
+        elixirMax = 10,
+        elixirInitial = 5
+    } = options;
+
+    return {
+        introOverlays: [
+            {
+                id: 'royale-intro',
+                title: 'Royale Arena',
+                subtitle:
+                    'Select a troop below, then tap your side of the arena to deploy. Spend elixir wisely and destroy the enemy King tower.',
+                buttonId: 'royale-play-btn',
+                buttonText: 'BATTLE',
+                visible: true,
+                onPrimaryClick:
+                    typeof onPrimaryClick === 'function'
+                        ? onPrimaryClick
+                        : () => window.dispatchEvent(new CustomEvent('royale-play-clicked'))
+            }
+        ],
+        progressBars: [
+            {
+                id: 'royale-elixir-bar',
+                initialValue: elixirInitial,
+                max: elixirMax,
+                showText: true,
+                textFormat: (v, max) => `Elixir ${v.toFixed(1)}/${max}`,
+                styles: {
+                    top: '56px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 'min(88vw, 320px)',
+                    zIndex: '70',
+                    padding: '0 8px'
+                }
+            }
+        ],
+        cardRails: [
+            {
+                id: 'royale-hand',
+                items: Array.isArray(cardItems) ? cardItems : [],
+                selectedIndex: 0,
+                onItemActivate:
+                    typeof onCardActivate === 'function'
+                        ? onCardActivate
+                        : () => {},
+                styles: {
+                    rail: {
+                        bottom: '6px'
+                    }
+                }
+            }
+        ]
+    };
+}
+
 export const UISettings = {
     buttons: [
         {
