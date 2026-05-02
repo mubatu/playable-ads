@@ -11,7 +11,7 @@ const UI_ELEMENT_MAP = {
     'buttons': UIButton,
     'joysticks': UIVirtualJoystick,
     'introOverlays': UIIntroOverlay,
-    'deployBadges': UIDeployBadge
+    'deployBadges': UIDeployBadge,
     'progressBars': UIProgressBar,
     'toggles': UIToggle
 };
