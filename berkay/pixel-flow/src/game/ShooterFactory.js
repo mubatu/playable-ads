@@ -29,7 +29,11 @@ function renderLabel(sprite, ammo) {
     ctx.clearRect(0, 0, 128, 64);
     ctx.fillStyle = 'rgba(8, 17, 31, 0.85)';
     ctx.beginPath();
-    ctx.roundRect(8, 10, 112, 44, 16);
+    if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(8, 10, 112, 44, 16);
+    } else {
+        ctx.rect(8, 10, 112, 44);
+    }
     ctx.fill();
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 26px Arial';
@@ -57,6 +61,7 @@ export class ShooterFactory {
         root.userData.label = label;
         root.userData.color = 0xffffff;
         root.userData.ammo = 0;
+        root.scale.setScalar(0.78);
         root.visible = false;
         return root;
     }

@@ -1,20 +1,15 @@
 import * as THREE from 'three';
 import '../../../resuables/components/HandTutorial.js';
-import { Timer } from '../../../resuables/components/Timer.js';
 import { ObjectPool } from '../../../resuables/components/ObjectPool.js';
 import { PixelGrid } from './game/PixelGrid.js';
 import { ShooterFactory } from './game/ShooterFactory.js';
-import { FlowQueue } from './game/FlowQueue.js';
+import { SquarePath } from './game/SquarePath.js';
+import { QueueLanes } from './game/QueueLanes.js';
+import { ShooterBucket } from './game/ShooterBucket.js';
+import { BulletFactory } from './game/BulletFactory.js';
 import { PixelFlowHUD } from './ui/PixelFlowHUD.js';
-
-const LEVEL = {
-    queueCapacity: 5,
-    rows: 8,
-    cols: 8,
-    duration: 55,
-    maxActiveShooters: 3,
-    colors: [0xff5e7d, 0x58a7ff, 0xffcf4d, 0x60d394]
-};
+import { DEFAULT_LEVEL } from './levels/defaultLevel.js';
+import { buildInitialQueues, countPixelsByColorIndex } from './levels/buildInitialQueues.js';
 
 const HAND_ICON_SVG = [
     '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">',
@@ -24,23 +19,28 @@ const HAND_ICON_SVG = [
 ].join('');
 
 export class Scene {
-    constructor() {
+    constructor(level = DEFAULT_LEVEL) {
+        this.level = level;
         this.scene = null;
         this.camera = null;
         this.renderer = null;
         this.clock = new THREE.Clock();
 
         this.grid = null;
-        this.queue = null;
+        this.path = null;
+        this.queueLanes = null;
+        this.bucket = null;
         this.shooterPool = null;
+        this.bulletPool = null;
         this.activeShooters = [];
+        this.flyingBullets = [];
 
         this.hud = null;
-        this.timer = null;
         this.handTutorial = null;
-
         this.gameState = 'waiting';
-        this.lastQueueSignature = '';
+
+        this.lastLaneSig = '';
+        this.lastBucketSig = '';
 
         this.animate = this.animate.bind(this);
         this.onResize = this.onResize.bind(this);
@@ -49,19 +49,21 @@ export class Scene {
     build() {
         this.setupRenderer();
         this.setupWorld();
-        this.setupSystems();
+        this.setupGridAndPath();
+        this.setupQueues();
+        this.setupPools();
+        this.setupHUD();
         this.bindEvents();
         this.renderer.setAnimationLoop(this.animate);
     }
 
     setupRenderer() {
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x0a1627);
-        this.scene.fog = new THREE.Fog(0x0a1627, 10, 30);
+        this.scene.background = new THREE.Color(0x0b1528);
 
-        this.camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 100);
-        this.camera.position.set(0, 1.4, 9.4);
-        this.camera.lookAt(0, 0.9, 0);
+        this.camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 100);
+        this.camera.position.set(0, 5.4, 6.2);
+        this.camera.lookAt(0, 0.25, 0);
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -73,191 +75,342 @@ export class Scene {
     }
 
     setupWorld() {
-        const ambient = new THREE.AmbientLight(0xffffff, 1.0);
+        const ambient = new THREE.AmbientLight(0xffffff, 0.95);
         this.scene.add(ambient);
 
-        const key = new THREE.DirectionalLight(0xd1e0ff, 1.2);
-        key.position.set(-4, 8, 7);
-        this.scene.add(key);
+        const sun = new THREE.DirectionalLight(0xe3ecff, 1.05);
+        sun.position.set(-5, 12, 8);
+        this.scene.add(sun);
 
-        const fill = new THREE.DirectionalLight(0xffbb8a, 0.65);
-        fill.position.set(5, -2, 6);
-        this.scene.add(fill);
-
-        const boardBase = new THREE.Mesh(
-            new THREE.PlaneGeometry(7.5, 7.5),
-            new THREE.MeshStandardMaterial({ color: 0x182a49, roughness: 0.9 })
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(40, 40),
+            new THREE.MeshStandardMaterial({ color: 0x1a2d4a, roughness: 0.92 })
         );
-        boardBase.position.set(0, 1.9, -0.28);
-        this.scene.add(boardBase);
-
-        const conveyor = new THREE.Mesh(
-            new THREE.BoxGeometry(10.2, 0.36, 0.92),
-            new THREE.MeshStandardMaterial({ color: 0x243a66, roughness: 0.8, metalness: 0.1 })
-        );
-        conveyor.position.set(0, -1.7, 0.2);
-        this.scene.add(conveyor);
+        ground.rotation.x = -Math.PI * 0.5;
+        ground.position.y = -0.02;
+        this.scene.add(ground);
     }
 
-    setupSystems() {
+    setupGridAndPath() {
         this.grid = new PixelGrid(this.scene, {
-            rows: LEVEL.rows,
-            cols: LEVEL.cols,
-            palette: LEVEL.colors
+            rows: this.level.rows,
+            cols: this.level.cols,
+            cellSize: this.level.cellSize,
+            colors: this.level.colors,
+            gridColorIndices: this.level.gridColorIndices
         });
         this.grid.build();
 
-        this.queue = new FlowQueue(LEVEL.queueCapacity);
-        this.queue.seed(this.createInitialQueue());
+        const b = this.grid.getBounds();
+        this.path = new SquarePath(b, this.level.pathPadding);
+    }
 
+    setupQueues() {
+        const built =
+            Array.isArray(this.level.lanes) && this.level.lanes.length > 0
+                ? this.level.lanes.map((lane) => lane.map((e) => ({ ...e })))
+                : buildInitialQueues(this.level);
+
+        const laneData = built.map((lane) =>
+            lane.map((e) => ({
+                color: this.level.colors[e.colorIndex % this.level.colors.length],
+                ammo: e.ammo
+            }))
+        );
+        this.queueLanes = new QueueLanes(laneData);
+        this.bucket = new ShooterBucket(this.level.bucketCapacity);
+        this.verifyAmmoMatchesPixels(built);
+    }
+
+    verifyAmmoMatchesPixels(builtLanes) {
+        const numColors = this.level.colors.length;
+        const pixels = countPixelsByColorIndex(this.level.gridColorIndices, numColors);
+        const ammo = Array(numColors).fill(0);
+        for (let L = 0; L < builtLanes.length; L += 1) {
+            const lane = builtLanes[L];
+            for (let i = 0; i < lane.length; i += 1) {
+                const e = lane[i];
+                ammo[e.colorIndex % numColors] += e.ammo;
+            }
+        }
+        for (let c = 0; c < numColors; c += 1) {
+            if (ammo[c] !== pixels[c]) {
+                console.warn('[PixelFlow] ammo vs pixels mismatch', { colorIndex: c, ammo: ammo[c], pixels: pixels[c] });
+            }
+        }
+    }
+
+    setupPools() {
         this.shooterPool = new ObjectPool(
             () => ShooterFactory.create(),
             (shooter) => {
                 shooter.visible = false;
                 shooter.userData.ammo = 0;
+                if (shooter.parent) {
+                    shooter.parent.remove(shooter);
+                }
             },
-            12
+            16
         );
-
-        this.hud = new PixelFlowHUD({
-            onPlay: () => this.startGame(),
-            onQueueTap: (index) => this.launchFromQueue(index),
-            onDownload: () => window.open('https://www.google.com', '_blank')
-        });
-        this.hud.build();
-        this.refreshHUD('Tap PLAY NOW to begin flow.');
+        this.bulletPool = new ObjectPool(
+            () => BulletFactory.create(),
+            (mesh) => {
+                mesh.visible = false;
+                if (mesh.parent) {
+                    mesh.parent.remove(mesh);
+                }
+            },
+            40
+        );
     }
 
-    createInitialQueue() {
-        const entries = [];
-        for (let index = 0; index < LEVEL.queueCapacity; index += 1) {
-            entries.push({
-                color: LEVEL.colors[index % LEVEL.colors.length],
-                ammo: 3 + (index % 3)
-            });
-        }
-        return entries;
+    setupHUD() {
+        this.hud = new PixelFlowHUD({
+            onPlay: () => this.startGame(),
+            onQueueFrontTap: (lane) => this.deployFromLane(lane),
+            onBucketTap: (slot) => this.deployFromBucket(slot),
+            onDownload: () => window.open('https://www.google.com', '_blank')
+        });
+        this.hud.build({
+            laneCount: this.level.laneCount,
+            maxLaneDepth: this.level.maxLaneDepth,
+            bucketCapacity: this.level.bucketCapacity
+        });
+        this.syncUI(true);
+        this.hud.setStatus(
+            'Tap PLAY NOW. Queue: front pig only. Bucket: tap any pig. Max ' +
+                (this.level.maxPathShooters ?? 5) +
+                ' on the path.'
+        );
     }
 
     startGame() {
         if (this.gameState !== 'waiting') {
             return;
         }
-
         this.gameState = 'playing';
         this.hud.hidePlayOverlay();
-        this.timer = new Timer(LEVEL.duration, 'circular', () => this.finish(false));
-        this.timer.element.style.top = '16px';
-        this.timer.element.style.right = '16px';
-        this.timer.element.style.left = 'auto';
-        this.timer.element.style.transform = 'none';
-        this.timer.element.style.zIndex = '80';
-
-        this.refreshHUD('Tap any queue slot to deploy a pig.');
-        this.showQueueTutorial();
+        this.syncUI(true);
+        this.hud.setStatus('Clear edge pixels first — shots stop on the first blocking color.');
+        this.showTutorial();
     }
 
-    launchFromQueue(index) {
+    deployFromLane(laneIndex) {
         if (this.gameState !== 'playing') {
             return;
         }
-
-        if (this.activeShooters.length >= LEVEL.maxActiveShooters) {
-            this.refreshHUD('Conveyor crowded. Wait for a pig to finish.');
+        const cap = this.level.maxPathShooters ?? 5;
+        if (this.activeShooters.length >= cap) {
+            this.hud.setStatus(`Path full (${cap} max). Wait for a pig to finish a lap or run out of ammo.`);
             return;
         }
-
-        const entry = this.queue.popAt(index);
+        const entry = this.queueLanes.popFront(laneIndex);
         if (!entry) {
             return;
         }
+        this.stopTutorial();
+        this.spawnRunner(entry);
+        this.syncUI(true);
+    }
 
-        if (this.handTutorial) {
-            this.stopTutorial();
+    deployFromBucket(slotIndex) {
+        if (this.gameState !== 'playing') {
+            return;
         }
+        const cap = this.level.maxPathShooters ?? 5;
+        if (this.activeShooters.length >= cap) {
+            this.hud.setStatus(`Path full (${cap} max). Wait before launching from the bucket.`);
+            return;
+        }
+        const entry = this.bucket.takeAt(slotIndex);
+        if (!entry) {
+            return;
+        }
+        this.stopTutorial();
+        this.spawnRunner(entry);
+        this.syncUI(true);
+    }
 
-        const shooter = this.shooterPool.get();
-        ShooterFactory.configure(shooter, entry);
-        shooter.position.set(-4.7, -1.65, 0.55);
-        shooter.visible = true;
-        this.scene.add(shooter);
-
+    spawnRunner(entry) {
+        const mesh = this.shooterPool.get();
+        ShooterFactory.configure(mesh, entry);
+        const py = this.level.pathY;
+        mesh.position.set(0, py, 0);
+        this.scene.add(mesh);
         this.activeShooters.push({
-            mesh: shooter,
+            mesh,
             color: entry.color,
             ammo: entry.ammo,
-            progress: 0,
+            t: 0,
             fireCooldown: 0
         });
-
-        this.refreshHUD('Flow running...');
     }
 
-    updateActiveShooters(delta) {
-        for (let index = this.activeShooters.length - 1; index >= 0; index -= 1) {
-            const shooter = this.activeShooters[index];
-            shooter.progress += delta * 0.28;
-            shooter.fireCooldown = Math.max(0, shooter.fireCooldown - delta);
-
-            const x = -4.7 + shooter.progress * 9.4;
-            shooter.mesh.position.x = x;
-            shooter.mesh.rotation.y = Math.PI * 0.5;
-
-            if (shooter.ammo > 0 && shooter.fireCooldown <= 0) {
-                const hit = this.grid.consumeMatchingCell(shooter.color);
-                if (hit) {
-                    shooter.ammo -= 1;
-                    ShooterFactory.setAmmo(shooter.mesh, shooter.ammo);
-                    shooter.fireCooldown = 0.22;
-                }
-            }
-
-            if (shooter.progress >= 1) {
-                this.activeShooters.splice(index, 1);
-                this.completeShooterRun(shooter);
-            }
+    completeLap(run) {
+        const idx = this.activeShooters.indexOf(run);
+        if (idx !== -1) {
+            this.activeShooters.splice(idx, 1);
         }
-    }
-
-    completeShooterRun(shooter) {
-        if (shooter.ammo > 0) {
-            const added = this.queue.push({ color: shooter.color, ammo: shooter.ammo });
-            if (!added) {
+        if (run.ammo > 0) {
+            if (!this.bucket.tryAdd({ color: run.color, ammo: run.ammo })) {
                 this.finish(false);
             }
         }
-
-        this.shooterPool.release(shooter.mesh);
-        this.refreshHUD('Manage queue and matching colors.');
+        this.shooterPool.release(run.mesh);
     }
 
-    showQueueTutorial() {
+    despawnRunner(run) {
+        const idx = this.activeShooters.indexOf(run);
+        if (idx !== -1) {
+            this.activeShooters.splice(idx, 1);
+        }
+        this.shooterPool.release(run.mesh);
+    }
+
+    spawnBullet(from, to, color) {
+        const mesh = this.bulletPool.get();
+        BulletFactory.setColor(mesh, color);
+        mesh.position.copy(from);
+        mesh.visible = true;
+        this.scene.add(mesh);
+        this.flyingBullets.push({
+            mesh,
+            from: from.clone(),
+            to: to.clone(),
+            elapsed: 0,
+            duration: 0.12
+        });
+    }
+
+    updateBullets(delta) {
+        for (let i = this.flyingBullets.length - 1; i >= 0; i -= 1) {
+            const b = this.flyingBullets[i];
+            b.elapsed += delta;
+            const a = Math.min(1, b.elapsed / b.duration);
+            b.mesh.position.lerpVectors(b.from, b.to, a);
+            if (b.elapsed >= b.duration) {
+                this.bulletPool.release(b.mesh);
+                this.flyingBullets.splice(i, 1);
+            }
+        }
+    }
+
+    updateRunners(delta) {
+        const speed = this.level.pathSpeed;
+        const perim = this.path.perimeter;
+
+        for (let i = this.activeShooters.length - 1; i >= 0; i -= 1) {
+            const run = this.activeShooters[i];
+            run.t += (speed * delta) / perim;
+            if (run.t >= 1) {
+                this.completeLap(run);
+                continue;
+            }
+
+            const st = this.path.sample(run.t);
+            const py = this.level.pathY;
+            run.mesh.position.set(st.x, py, st.z);
+            run.mesh.lookAt(0, py, 0);
+
+            run.fireCooldown -= delta;
+
+            if (run.ammo > 0 && run.fireCooldown <= 0) {
+                const hit = this.grid.tryShootFromSide(st.side, st.x, st.z, run.color);
+                if (hit) {
+                    run.ammo -= 1;
+                    ShooterFactory.setAmmo(run.mesh, run.ammo);
+                    run.fireCooldown = 0.22;
+                    const muzzle = new THREE.Vector3(st.x, py + 0.12, st.z);
+                    this.spawnBullet(muzzle, hit.worldHit, run.color);
+                }
+            }
+
+            if (run.ammo <= 0) {
+                this.despawnRunner(run);
+            }
+        }
+    }
+
+    syncUI(force) {
+        const laneSnap = this.queueLanes.snapshot();
+        const laneSig = laneSnap.map((l) => l.map((e) => `${e.color}:${e.ammo}`).join(',')).join('|');
+        if (force || laneSig !== this.lastLaneSig) {
+            this.lastLaneSig = laneSig;
+            this.hud.updateLanes(laneSnap);
+        }
+
+        const bucketSnap = this.bucket.snapshot();
+        const bucketSig = bucketSnap.map((e) => (e ? `${e.color}:${e.ammo}` : '-')).join('|');
+        if (force || bucketSig !== this.lastBucketSig) {
+            this.lastBucketSig = bucketSig;
+            this.hud.updateBucket(bucketSnap);
+        }
+
+        this.hud.setProgress(this.grid.total - this.grid.remaining, this.grid.total);
+    }
+
+    checkEnd() {
+        if (this.grid.remaining <= 0) {
+            this.finish(true);
+            return;
+        }
+        if (
+            this.queueLanes.isEveryLaneEmpty() &&
+            this.activeShooters.length === 0 &&
+            this.bucket.countFilled() === 0 &&
+            this.grid.remaining > 0
+        ) {
+            this.finish(false);
+        }
+    }
+
+    finish(isWin) {
+        if (this.gameState === 'ended') {
+            return;
+        }
+        this.gameState = 'ended';
+        this.stopTutorial();
+        this.hud.showEnd(isWin);
+        this.hud.setStatus(
+            isWin ? 'Board cleared.' : 'Bucket overflow or no moves left.'
+        );
+    }
+
+    showTutorial() {
         if (!window.HandTutorial) {
             return;
         }
-
-        const point = this.hud.getQueueButtonCenter(0);
-        if (!point) {
-            return;
-        }
-
-        this.handTutorial = new window.HandTutorial({
-            container: document.body,
-            renderer: this.renderer,
-            camera: this.camera,
-            assetUrl: `data:image/svg+xml;utf8,${encodeURIComponent(HAND_ICON_SVG)}`,
-            gesture: 'tap',
-            from: {
-                space: 'screen',
-                x: point.x / window.innerWidth,
-                y: point.y / window.innerHeight
-            },
-            size: 108,
-            duration: 1.15,
-            loop: true,
-            zIndex: 70
+        requestAnimationFrame(() => {
+            let point = null;
+            for (let lane = 0; lane < this.level.laneCount; lane += 1) {
+                if (this.queueLanes.peekFront(lane)) {
+                    point = this.hud.getFrontSlotCenter(lane);
+                    if (point) {
+                        break;
+                    }
+                }
+            }
+            if (!point) {
+                return;
+            }
+            this.handTutorial = new window.HandTutorial({
+                container: document.body,
+                renderer: this.renderer,
+                camera: this.camera,
+                assetUrl: `data:image/svg+xml;utf8,${encodeURIComponent(HAND_ICON_SVG)}`,
+                gesture: 'tap',
+                from: {
+                    space: 'screen',
+                    x: point.x / window.innerWidth,
+                    y: point.y / window.innerHeight
+                },
+                size: 100,
+                duration: 1.05,
+                loop: true,
+                zIndex: 70
+            });
+            this.handTutorial.play();
         });
-        this.handTutorial.play();
     }
 
     stopTutorial() {
@@ -268,53 +421,14 @@ export class Scene {
         this.handTutorial = null;
     }
 
-    refreshHUD(statusText) {
-        this.hud.setStatus(statusText);
-        const queueSnapshot = this.queue.snapshot();
-        const queueSignature = queueSnapshot.map((entry) => `${entry.color}:${entry.ammo}`).join('|');
-        if (queueSignature !== this.lastQueueSignature) {
-            this.hud.setQueue(queueSnapshot, LEVEL.queueCapacity);
-            this.lastQueueSignature = queueSignature;
-        }
-        this.hud.setProgress(this.grid.total - this.grid.remaining, this.grid.total);
-    }
-
-    checkEndConditions() {
-        if (this.grid.remaining <= 0) {
-            this.finish(true);
-            return;
-        }
-
-        if (this.queue.isEmpty() && this.activeShooters.length === 0 && this.grid.remaining > 0) {
-            this.finish(false);
-        }
-    }
-
-    finish(isWin) {
-        if (this.gameState === 'ended') {
-            return;
-        }
-
-        this.gameState = 'ended';
-        this.stopTutorial();
-        if (this.timer) {
-            this.timer.destroy();
-            this.timer = null;
-        }
-        this.hud.showEnd(isWin);
-        this.hud.setStatus(isWin ? 'Pixel board cleared.' : 'Flow broken. Try another sequence.');
-    }
-
     animate() {
         const delta = this.clock.getDelta();
 
         if (this.gameState === 'playing') {
-            if (this.timer) {
-                this.timer.update(delta);
-            }
-            this.updateActiveShooters(delta);
-            this.hud.setProgress(this.grid.total - this.grid.remaining, this.grid.total);
-            this.checkEndConditions();
+            this.updateRunners(delta);
+            this.updateBullets(delta);
+            this.syncUI(false);
+            this.checkEnd();
         }
 
         if (this.handTutorial && this.gameState === 'playing') {
