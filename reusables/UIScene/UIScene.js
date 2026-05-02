@@ -3,6 +3,8 @@ import { UIButton } from './UISceneElements/UIButton.js';
 import { UIVirtualJoystick } from './UISceneElements/UIVirtualJoystick';
 import { UIIntroOverlay } from './UISceneElements/UIIntroOverlay.js';
 import { UIDeployBadge } from './UISceneElements/UIDeployBadge.js';
+import { UIProgressBar } from './UISceneElements/UIProgressBar.js';
+import { UIToggle } from './UISceneElements/UIToggle.js';
 
 // Factory Map: Links config types to classes
 const UI_ELEMENT_MAP = {
@@ -10,6 +12,8 @@ const UI_ELEMENT_MAP = {
     'joysticks': UIVirtualJoystick,
     'introOverlays': UIIntroOverlay,
     'deployBadges': UIDeployBadge
+    'progressBars': UIProgressBar,
+    'toggles': UIToggle
 };
 
 export class UIScene {
