@@ -1,0 +1,57 @@
+{
+    "background": {
+        "sourceWidth": 1080,
+        "sourceHeight": 1920,
+        "worldHeight": 19.2,
+        "gradientTop": "#1b1556",
+        "gradientMiddle": "#0d1840",
+        "gradientBottom": "#060818",
+        "z": -5
+    },
+    "board": {
+        "columns": 8,
+        "rows": 8,
+        "gap": 0.08,
+        "padding": 0.22,
+        "maxWidth": 9.6,
+        "maxHeight": 9.6,
+        "offsetY": 1.5,
+        "backgroundColor": "#1a1d4a",
+        "cellColor": "#262a64"
+    },
+    "shapes": {
+        "spawnCount": 3,
+        "spawnOffsetY": -6.0,
+        "spawnSpacing": 3.2,
+        "previewScale": 0.55,
+        "dragOffsetY": 1.9,
+        "baseZ": 0.2,
+        "dragZ": 0.55,
+        "cellScale": 0.92,
+        "colors": [
+            "#ff5e7e",
+            "#ffaa3c",
+            "#ffe04a",
+            "#5fd56b",
+            "#3ec3ff",
+            "#7c6cff",
+            "#e766ff",
+            "#ff8a3a",
+            "#26d3a4"
+        ]
+    },
+    "scoring": {
+        "cellPoints": 1,
+        "lineBonus": 18,
+        "comboBonus": 10
+    },
+    "tutorial": {
+        "enabled": true,
+        "assetUrl": "../merge-mystery/src/assets/hand-2.png",
+        "gesture": "drag",
+        "size": 124,
+        "duration": 1.15,
+        "loopDelay": 0.45,
+        "startDelayMs": 700
+    }
+}

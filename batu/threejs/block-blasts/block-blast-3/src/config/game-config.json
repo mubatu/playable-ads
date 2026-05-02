@@ -1,0 +1,59 @@
+{
+    "background": {
+        "sourceWidth": 1080,
+        "sourceHeight": 1920,
+        "worldHeight": 19.2,
+        "baseColor": "#10131f",
+        "topColor": "#1d2731",
+        "accentColor": "#1fc7b7",
+        "warmAccentColor": "#ffb84d"
+    },
+    "board": {
+        "columns": 8,
+        "rows": 8,
+        "gap": 0.07,
+        "padding": 0.22,
+        "maxWidth": 9.4,
+        "maxHeight": 9.4,
+        "offsetY": 1.45,
+        "backgroundColor": "#24304a",
+        "cellColor": "#151b2a"
+    },
+    "shapes": {
+        "spawnCount": 3,
+        "spawnOffsetY": -5.65,
+        "spawnSpacing": 3.2,
+        "previewScale": 0.52,
+        "dragOffsetY": 2.0,
+        "baseZ": 0.2,
+        "dragZ": 0.5,
+        "cellScale": 0.92,
+        "colors": [
+            "#ff4f73",
+            "#1fc7b7",
+            "#29a3ff",
+            "#7fdc68",
+            "#ffd34d",
+            "#b066ff",
+            "#ff8a3d",
+            "#f45bd0",
+            "#4ee3ff",
+            "#9dff6e"
+        ]
+    },
+    "scoring": {
+        "cellPoints": 1,
+        "linePoints": 10,
+        "bonusPerExtraLine": 10,
+        "targetScore": 500
+    },
+    "tutorial": {
+        "enabled": true,
+        "assetUrl": "src/assets/hand-2.png",
+        "gesture": "drag",
+        "size": 120,
+        "duration": 1.2,
+        "loopDelay": 0.5,
+        "startDelayMs": 1000
+    }
+}

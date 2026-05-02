@@ -1,0 +1,152 @@
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #10131f;
+}
+
+body {
+    touch-action: none;
+    font-family: Arial, sans-serif;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+}
+
+canvas {
+    display: block;
+    cursor: grab;
+}
+
+#error-banner {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: rgba(24, 32, 40, 0.88);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.4;
+    z-index: 10;
+}
+
+#score-display {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ffffff;
+    min-width: 116px;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    z-index: 6;
+    text-align: center;
+    line-height: 1.2;
+}
+
+#score-display .label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    opacity: 0.7;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.score-popup {
+    position: absolute;
+    color: #FFEAA7;
+    font-size: 20px;
+    font-weight: 800;
+    pointer-events: none;
+    z-index: 8;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    animation: scoreFloat 0.8s ease-out forwards;
+}
+
+@keyframes scoreFloat {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(1.3);
+    }
+}
+
+#game-over-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 27, 42, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.game-over-content {
+    text-align: center;
+    color: #fff;
+    padding: 40px;
+}
+
+.game-over-content h1 {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 0 0 8px 0;
+    background: linear-gradient(135deg, #FFEAA7, #FF9F43);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.game-over-content .final-score {
+    font-size: 48px;
+    font-weight: 800;
+    margin: 16px 0;
+}
+
+.game-over-content .final-score .label {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    opacity: 0.6;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.game-over-content button {
+    margin-top: 24px;
+    padding: 14px 40px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #FFEAA7 0%, #FF9F43 100%);
+    color: #1a0533;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(255, 159, 67, 0.3);
+    transition: transform 0.15s ease;
+}
+
+.game-over-content button:active {
+    transform: scale(0.95);
+}

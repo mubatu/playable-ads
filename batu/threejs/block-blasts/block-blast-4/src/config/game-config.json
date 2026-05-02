@@ -1,0 +1,38 @@
+{
+    "world": {
+        "height": 19.2,
+        "sourceWidth": 1080,
+        "sourceHeight": 1920
+    },
+    "board": {
+        "columns": 8,
+        "rows": 8,
+        "gap": 0.08,
+        "padding": 0.20,
+        "maxWidth": 9.2,
+        "maxHeight": 9.2,
+        "offsetY": 1.8,
+        "backgroundColor": "#1a1a3e",
+        "cellColor": "#2d2d6e"
+    },
+    "tray": {
+        "offsetY": -5.8,
+        "slotSpacing": 3.3,
+        "scale": 0.65
+    },
+    "blocks": {
+        "dragOffsetY": 1.8,
+        "baseZ": 0.3,
+        "dragZ": 1.5,
+        "ghostOpacity": 0.4
+    },
+    "tutorial": {
+        "enabled": true,
+        "assetUrl": "./src/assets/hand-2.png",
+        "gesture": "drag",
+        "size": 120,
+        "duration": 1.2,
+        "loopDelay": 0.5,
+        "startDelayMs": 900
+    }
+}
