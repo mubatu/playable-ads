@@ -1,0 +1,188 @@
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #060818;
+}
+
+body {
+    touch-action: none;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #fff;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+}
+
+canvas {
+    display: block;
+    cursor: grab;
+}
+
+#error-banner {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(24, 32, 40, 0.88);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.4;
+    z-index: 50;
+}
+
+/* Score panel anchored to top centre, rendered above the canvas. */
+#bb2-score {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+    z-index: 6;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+}
+
+#bb2-score .label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 2px;
+}
+
+#bb2-score .value {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    background: linear-gradient(135deg, #ffe18f 0%, #ff7e8b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+#bb2-best {
+    position: absolute;
+    top: 26px;
+    left: 22px;
+    z-index: 6;
+    pointer-events: none;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.65;
+}
+
+#bb2-best span {
+    margin-left: 6px;
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffe18f;
+    letter-spacing: 0.02em;
+    opacity: 1;
+}
+
+.bb2-score-popup {
+    position: absolute;
+    transform: translateX(-50%);
+    color: #ffe18f;
+    font-size: 22px;
+    font-weight: 800;
+    pointer-events: none;
+    z-index: 8;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+    animation: bb2-popup 0.85s ease-out forwards;
+}
+
+.bb2-score-popup.combo {
+    color: #6affb6;
+    font-size: 26px;
+}
+
+@keyframes bb2-popup {
+    0% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -70px) scale(1.25); }
+}
+
+#bb2-game-over {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 8, 24, 0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    z-index: 30;
+    animation: bb2-fade 0.4s ease-out;
+    padding: 32px;
+    text-align: center;
+}
+
+@keyframes bb2-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#bb2-game-over h1 {
+    font-size: 44px;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, #ffe18f 0%, #ff7e8b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+#bb2-game-over .stats {
+    display: flex;
+    gap: 36px;
+    justify-content: center;
+    margin: 8px 0 14px;
+}
+
+#bb2-game-over .stat-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 4px;
+}
+
+#bb2-game-over .stat-value {
+    font-size: 34px;
+    font-weight: 800;
+    color: #fff;
+}
+
+#bb2-game-over button {
+    margin-top: 12px;
+    padding: 14px 36px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #ffe18f 0%, #ff7e8b 100%);
+    color: #21072c;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(255, 126, 139, 0.35);
+    transition: transform 0.15s ease;
+}
+
+#bb2-game-over button:active {
+    transform: scale(0.95);
+}
