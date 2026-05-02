@@ -1,4 +1,37 @@
 // ui-settings.js
+
+/** CoC-style intro + deploy badge; merge into `UIScene` settings (with empty `buttons` / `joysticks` if needed). */
+export function getCocPlayableUIConfig(barbarianStock) {
+    return {
+        introOverlays: [
+            {
+                id: 'coc-intro',
+                title: 'Clash of Clans',
+                subtitle:
+                    'Tap any tile on the outer edge of the base to deploy a Barbarian. Destroy the Town Hall before time runs out.',
+                buttonId: 'coc-play-btn',
+                buttonText: 'PLAY NOW',
+                visible: true,
+                onPrimaryClick: () => window.dispatchEvent(new CustomEvent('coc-play-clicked'))
+            }
+        ],
+        deployBadges: [
+            {
+                id: 'coc-deploy-badge',
+                initialText: `${barbarianStock}/${barbarianStock}`,
+                portraitBackground: 'radial-gradient(circle at 50% 35%, #ff8a3d 0%, #b65020 75%)',
+                styles: {
+                    wrapper: {
+                        bottom: '18px',
+                        right: '18px',
+                        zIndex: '90'
+                    }
+                }
+            }
+        ]
+    };
+}
+
 export const UISettings = {
     buttons: [
         {
@@ -45,5 +78,7 @@ export const UISettings = {
                 // Or store it in a dedicated GameManager/InputManager
             }
         }
-    ]
+    ],
+    introOverlays: [],
+    deployBadges: []
 };
