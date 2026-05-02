@@ -1,6 +1,6 @@
 import { UISceneElement } from './UISceneElement.js';
-import { DOMElementPool } from '../../game/word-wheel/DOMElementPool.js';
-import { WordUnitFactory } from '../../game/word-wheel/WordUnitFactory.js';
+import { DOMElementPool } from '../../../../../../reusables/UIScene/UISceneElements/word-wheel/DOMElementPool.js';
+import { WordUnitFactory } from '../../../../../../reusables/UIScene/UISceneElements/word-wheel/WordUnitFactory.js';
 
 export class UIWordLetterWheel extends UISceneElement {
     constructor(config, container) {
