@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import '../../../resuables/components/HandTutorial.js';
-import { Timer } from '../../../resuables/components/Timer.js';
-import { ObjectPool } from '../../../resuables/components/ObjectPool.js';
+import '../../../../reusables/components/HandTutorial.js';
+import { Timer } from '../../../../reusables/components/Timer.js';
+import { ObjectPool } from '../../../../reusables/components/ObjectPool.js';
 import { CarFactory } from './game/CarFactory.js';
 import { TrayMatcher } from './game/TrayMatcher.js';
 import { GameHUD } from './ui/GameHUD.js';
+import { GAME_CONFIG } from '../config/gameConfig.js';
 
 const HAND_ICON_SVG = [
     '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">',
@@ -12,13 +13,6 @@ const HAND_ICON_SVG = [
     '<path d="M51 106c-10-10-15-23-15-36 0-9 5-15 11-15 5 0 8 3 10 7V30c0-5 4-9 9-9s9 4 9 9v21h2V35c0-5 4-9 9-9s9 4 9 9v20h2V43c0-5 4-9 9-9s9 4 9 9v34c0 24-16 43-41 43H74c-9 0-17-5-23-14z" fill="#ffffff"/>',
     '</svg>'
 ].join('');
-
-const LEVEL = {
-    rows: 4,
-    cols: 6,
-    trayCapacity: 7,
-    colors: [0xff5b5b, 0xffba49, 0x4dcc8a, 0x57a4ff]
-};
 
 export class Scene {
     constructor() {
@@ -57,7 +51,7 @@ export class Scene {
 
     setupRenderer() {
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x7ec9ff);
+        this.scene.background = new THREE.Color(GAME_CONFIG.scene.background);
 
         this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
         this.camera.position.set(0, 7.2, 7.8);
@@ -80,8 +74,8 @@ export class Scene {
         this.scene.add(key);
 
         const floor = new THREE.Mesh(
-            new THREE.PlaneGeometry(15, 15),
-            new THREE.MeshStandardMaterial({ color: 0x365b72, roughness: 0.9, metalness: 0.05 })
+            new THREE.PlaneGeometry(GAME_CONFIG.scene.floorSize, GAME_CONFIG.scene.floorSize),
+            new THREE.MeshStandardMaterial({ color: GAME_CONFIG.scene.floorColor, roughness: 0.9, metalness: 0.05 })
         );
         floor.rotation.x = -Math.PI * 0.5;
         floor.position.y = -0.25;
@@ -89,25 +83,26 @@ export class Scene {
     }
 
     setupCars() {
+        const { rows, cols, cellSpacingX, cellSpacingZ } = GAME_CONFIG.grid;
         this.pool = new ObjectPool(
-            () => CarFactory.create(LEVEL.colors[0]),
+            () => CarFactory.create(GAME_CONFIG.colors[0]),
             (car) => {
                 car.visible = false;
                 car.userData.isBlocked = false;
                 car.userData.isCollected = false;
             },
-            LEVEL.rows * LEVEL.cols
+            rows * cols
         );
 
         let colorIndex = 0;
-        for (let row = 0; row < LEVEL.rows; row += 1) {
-            for (let col = 0; col < LEVEL.cols; col += 1) {
+        for (let row = 0; row < rows; row += 1) {
+            for (let col = 0; col < cols; col += 1) {
                 const car = this.pool.get();
-                const color = LEVEL.colors[colorIndex % LEVEL.colors.length];
+                const color = GAME_CONFIG.colors[colorIndex % GAME_CONFIG.colors.length];
                 colorIndex += 1;
 
                 CarFactory.recolor(car, color);
-                car.position.set((col - (LEVEL.cols - 1) * 0.5) * 1.15, 0, (row - (LEVEL.rows - 1) * 0.5) * 1.45);
+                car.position.set((col - (cols - 1) * 0.5) * cellSpacingX, 0, (row - (rows - 1) * 0.5) * cellSpacingZ);
                 car.lookAt(this.camera.position.x, car.position.y, this.camera.position.z);
                 car.visible = true;
                 car.userData.grid = { row, col };
@@ -120,7 +115,7 @@ export class Scene {
         this.totalCars = this.gridCars.length;
         this.updateBlockedStates();
 
-        this.trayMatcher = new TrayMatcher(LEVEL.trayCapacity, (matchedEntries) => {
+        this.trayMatcher = new TrayMatcher(GAME_CONFIG.trayCapacity, (matchedEntries) => {
             for (let index = 0; index < matchedEntries.length; index += 1) {
                 const entry = matchedEntries[index];
                 this.clearedCount += 1;
@@ -136,7 +131,7 @@ export class Scene {
             onDownload: () => window.open('https://www.google.com', '_blank')
         });
         this.hud.build();
-        this.hud.setTray([], LEVEL.trayCapacity);
+        this.hud.setTray([], GAME_CONFIG.trayCapacity);
         this.updateStatus();
     }
 
@@ -147,7 +142,7 @@ export class Scene {
 
         this.gameState = 'playing';
         this.hud.hidePlay();
-        this.timer = new Timer(50, 'circular', () => this.finish(false));
+        this.timer = new Timer(GAME_CONFIG.timerSeconds, 'circular', () => this.finish(false));
         this.timer.element.style.top = '16px';
         this.timer.element.style.left = 'auto';
         this.timer.element.style.right = '16px';
@@ -242,7 +237,7 @@ export class Scene {
 
     refreshTray() {
         const colors = this.trayMatcher.slots.map((entry) => entry.color);
-        this.hud.setTray(colors, LEVEL.trayCapacity);
+        this.hud.setTray(colors, GAME_CONFIG.trayCapacity);
     }
 
     showTutorial() {
@@ -290,7 +285,7 @@ export class Scene {
         if (this.gameState === 'ended') {
             return;
         }
-        this.hud.setStatus(`Cars left: ${remaining} | Tray: ${this.trayMatcher.slots.length}/${LEVEL.trayCapacity}`);
+        this.hud.setStatus(`Cars left: ${remaining} | Tray: ${this.trayMatcher.slots.length}/${GAME_CONFIG.trayCapacity}`);
     }
 
     finish(isWin) {

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import './components/HandTutorial.js';
+import { GAME_CONFIG } from '../config/gameConfig.js';
 import { PixelGrid } from './game/PixelGrid.js';
 import { PathTrack } from './game/PathTrack.js';
 import { ShooterFactory } from './game/ShooterFactory.js';
@@ -14,8 +15,7 @@ const HAND_ICON_SVG = [
     '</svg>'
 ].join('');
 
-function createDefaultPixelArt(size) {
-    const palette = [0x08111f, 0x1f3b73, 0x2f67c8, 0x54bdf7, 0xaef3ff];
+function createDefaultPixelArt(size, palette) {
     const pixels = [];
     const center = (size - 1) / 2;
 
@@ -107,7 +107,6 @@ export class PixelPopScene {
     }
 
     build() {
-        this.setupDocument();
         this.setupRenderer();
         this.setupWorld();
         this.setupGameplay();
@@ -115,14 +114,6 @@ export class PixelPopScene {
         this.setupTutorial();
         this.bindEvents();
         this.animate();
-    }
-
-    setupDocument() {
-        Object.assign(document.body.style, {
-            margin: '0',
-            overflow: 'hidden',
-            background: 'radial-gradient(circle at top, #152545 0%, #08111f 50%, #04070d 100%)'
-        });
     }
 
     setupRenderer() {
@@ -153,18 +144,19 @@ export class PixelPopScene {
         fill.position.set(4, -1, 8);
         this.scene.add(fill);
 
+        const bd = GAME_CONFIG.world.backdrop;
         const backdrop = new THREE.Mesh(
-            new THREE.PlaneGeometry(44, 32),
-            new THREE.MeshBasicMaterial({ color: 0x07111e, transparent: true, opacity: 0.95 })
+            new THREE.PlaneGeometry(bd.width, bd.height),
+            new THREE.MeshBasicMaterial({ color: bd.color, transparent: true, opacity: bd.opacity })
         );
-        backdrop.position.set(0, 0, -8);
+        backdrop.position.set(0, 0, bd.z);
         this.scene.add(backdrop);
 
         const stars = new THREE.Group();
         const starGeometry = new THREE.SphereGeometry(0.03, 8, 8);
         const starMaterial = new THREE.MeshBasicMaterial({ color: 0xb9ccff });
 
-        for (let index = 0; index < 60; index += 1) {
+        for (let index = 0; index < GAME_CONFIG.world.starCount; index += 1) {
             const star = new THREE.Mesh(starGeometry, starMaterial);
             star.position.set((Math.random() - 0.5) * 36, (Math.random() - 0.5) * 20, -7.5 - Math.random() * 2);
             star.scale.setScalar(0.5 + Math.random() * 1.6);
@@ -175,15 +167,16 @@ export class PixelPopScene {
     }
 
     setupGameplay() {
-        const pixelArt = createDefaultPixelArt(9);
+        const pixelArt = createDefaultPixelArt(GAME_CONFIG.pixelArtSize, GAME_CONFIG.pixelPalette);
         const pixelTotals = countPixelColors(pixelArt);
+        const g = GAME_CONFIG.grid;
 
         this.grid = new PixelGrid(this.scene, {
-            rows: 9,
-            cols: 9,
-            cellSize: 0.6,
-            gap: 0.055,
-            position: { x: 0, y: 1.85, z: 0 },
+            rows: g.rows,
+            cols: g.cols,
+            cellSize: g.cellSize,
+            gap: g.gap,
+            position: g.position,
             pixels: pixelArt,
             onCellDestroyed: () => {
                 this.hud?.setProgress(this.grid.remainingCount, this.grid.totalCount);
@@ -194,26 +187,28 @@ export class PixelPopScene {
             }
         });
 
+        const p = GAME_CONFIG.path;
         this.path = new PathTrack({
-            center: { x: 0, y: 1.85, z: 0.8 },
-            width: this.grid.bounds.width + 2.8,
-            height: this.grid.bounds.height + 2.8,
-            railHeight: 0.26,
-            railThickness: 0.18
+            center: p.pathCenter,
+            width: this.grid.bounds.width + p.boundsPadding,
+            height: this.grid.bounds.height + p.boundsPadding,
+            railHeight: p.railHeight,
+            railThickness: p.railThickness
         });
 
         this.scene.add(this.path.group);
 
-        this.shooterPool = ShooterFactory.createPool(this.scene, 24);
-        this.bulletPool = BulletFactory.createPool(this.scene, 80);
+        this.shooterPool = ShooterFactory.createPool(this.scene, GAME_CONFIG.pools.shooters);
+        this.bulletPool = BulletFactory.createPool(this.scene, GAME_CONFIG.pools.bullets);
 
+        const q = GAME_CONFIG.queue;
         this.queueSystem = new ShooterQueueSystem(this.scene, {
             shooterPool: this.shooterPool,
-            queueCount: 4,
-            bucketSize: 5,
-            queueLength: 4,
-            queueAnchorY: -5.95,
-            bucketAnchorY: -6.3,
+            queueCount: q.queueCount,
+            bucketSize: q.bucketSize,
+            queueLength: q.queueLength,
+            queueAnchorY: q.queueAnchorY,
+            bucketAnchorY: q.bucketAnchorY,
             onSelectShooter: (shooter) => this.launchShooter(shooter)
         });
 
@@ -221,7 +216,7 @@ export class PixelPopScene {
     }
 
     populateQueues(pixelTotals) {
-        const queueColors = [0x1f3b73, 0x2f67c8, 0x54bdf7, 0xaef3ff];
+        const queueColors = GAME_CONFIG.queueColors;
         const bulletsByColor = queueColors.map((color) => splitTotalAcrossSlots(pixelTotals.get(color) || 0, this.queueSystem.queueCount));
 
         for (let queueIndex = 0; queueIndex < this.queueSystem.queueCount; queueIndex += 1) {
@@ -297,7 +292,7 @@ export class PixelPopScene {
             return;
         }
 
-        if (this.activeRuns.length >= 5) {
+        if (this.activeRuns.length >= GAME_CONFIG.gameplay.maxConcurrentShooters) {
             this.hud?.setMessage('Only five shooters can move at once. Wait for one to finish before launching another.');
             return;
         }
@@ -358,7 +353,7 @@ export class PixelPopScene {
                 this.fireBullet(shooter, targetCell);
                 shooter.userData.bulletsRemaining -= 1;
                 ShooterFactory.setLabel(shooter, shooter.userData.bulletsRemaining);
-                run.fireCooldown = 0.28;
+                run.fireCooldown = GAME_CONFIG.gameplay.fireCooldown;
 
                 if (shooter.userData.bulletsRemaining <= 0) {
                     this.finishShooter(shooter);

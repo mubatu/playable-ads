@@ -1,16 +1,16 @@
 import * as THREE from 'three';
-import '../../../reusables/components/HandTutorial.js';
-import { Timer } from '../../../reusables/components/Timer.js';
-import { ObjectPool } from '../../../reusables/components/ObjectPool.js';
+import '../../../../reusables/components/HandTutorial.js';
+import { Timer } from '../../../../reusables/components/Timer.js';
+import { ObjectPool } from '../../../../reusables/components/ObjectPool.js';
 import { Grid } from './game/Grid.js';
 import { BuildingFactory, BUILDING_SPECS } from './game/BuildingFactory.js';
 import { UnitFactory } from './game/UnitFactory.js';
 import { ProjectileFactory } from './game/ProjectileFactory.js';
 import { CombatSystem } from './game/CombatSystem.js';
-import { UIScene } from '../../../reusables/UIScene/UIScene.js';
-import { getCocPlayableUIConfig } from '../../../reusables/UIScene/UISceneSettings.js';
+import { UIScene } from '../../../../reusables/UIScene/UIScene.js';
+import { getCocPlayableUIConfig } from '../../../../reusables/UIScene/UISceneSettings.js';
 import { CocHUD } from './ui/CocHUD.js';
-import { DEFAULT_LEVEL } from './levels/defaultLevel.js';
+import { DEFAULT_LEVEL } from '../config/defaultLevel.js';
 import { createHpBarSprite, setHpBarRatio } from './game/HpBarSprite.js';
 
 const HAND_ICON_SVG = [
