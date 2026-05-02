@@ -1,16 +1,12 @@
-import { UISceneElement } from './UISceneElement.js';
-import { DOMElementPool } from './word-wheel/DOMElementPool.js';
-import { WordUnitFactory } from './word-wheel/WordUnitFactory.js';
+export class LetterWheel {
+    constructor(options) {
+        this.container = options.container;
+        this.letters = options.letters || [];
+        this.onSelectionStart = options.onSelectionStart || (() => {});
+        this.onSelectionChange = options.onSelectionChange || (() => {});
+        this.onSelectionCommit = options.onSelectionCommit || (() => {});
 
-export class UIWordLetterWheel extends UISceneElement {
-    constructor(config, container) {
-        super(config, container);
-
-        this.letters = config.letters || [];
-        this.onSelectionStart = config.onSelectionStart || (() => {});
-        this.onSelectionChange = config.onSelectionChange || (() => {});
-        this.onSelectionCommit = config.onSelectionCommit || (() => {});
-
+        this.root = null;
         this.tileElements = [];
         this.pathSvg = null;
         this.pathLine = null;
@@ -19,71 +15,37 @@ export class UIWordLetterWheel extends UISceneElement {
         this.selectedIndices = [];
         this.selectedSet = new Set();
 
-        this.tilePool = new DOMElementPool(
-            () => WordUnitFactory.createLetterTile(this.onTilePointerDown.bind(this)),
-            (tile) => {
-                tile.classList.remove('is-selected');
-                tile.dataset.index = '';
-                tile.textContent = '';
-                tile.style.transform = '';
-                if (tile.parentNode) {
-                    tile.parentNode.removeChild(tile);
-                }
-            }
-        );
-
         this.onPointerMove = this.onPointerMove.bind(this);
         this.onPointerUp = this.onPointerUp.bind(this);
     }
 
     build() {
-        this.element = document.createElement('div');
-        this.element.className = 'wow-letter-wheel';
+        this.root = document.createElement('div');
+        this.root.className = 'wow-letter-wheel';
 
         const ring = document.createElement('div');
         ring.className = 'wow-letter-wheel__ring';
-        this.element.appendChild(ring);
+        this.root.appendChild(ring);
 
         this.pathSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         this.pathSvg.setAttribute('class', 'wow-letter-wheel__path');
         this.pathLine = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         this.pathLine.setAttribute('class', 'wow-letter-wheel__polyline');
         this.pathSvg.appendChild(this.pathLine);
-        this.element.appendChild(this.pathSvg);
+        this.root.appendChild(this.pathSvg);
 
-        this.container.appendChild(this.element);
-        this.activate();
+        this.container.appendChild(this.root);
         this.setLetters(this.letters);
-    }
 
-    activate() {
-        super.activate();
         window.addEventListener('pointermove', this.onPointerMove);
         window.addEventListener('pointerup', this.onPointerUp);
         window.addEventListener('pointercancel', this.onPointerUp);
     }
 
-    deactivate() {
-        super.deactivate();
-        window.removeEventListener('pointermove', this.onPointerMove);
-        window.removeEventListener('pointerup', this.onPointerUp);
-        window.removeEventListener('pointercancel', this.onPointerUp);
-    }
-
-    onTilePointerDown(event) {
-        event.preventDefault();
-
-        const index = Number(event.currentTarget.dataset.index);
-        if (Number.isNaN(index)) {
-            return;
-        }
-
-        this.startSelection(index);
-    }
-
     setLetters(letters) {
         this.letters = letters.slice();
-        this.releaseAllTiles();
+        this.tileElements.forEach((tile) => tile.remove());
+        this.tileElements = [];
         this.clearSelection();
 
         const count = this.letters.length;
@@ -94,21 +56,21 @@ export class UIWordLetterWheel extends UISceneElement {
             const x = Math.cos(angle) * radius;
             const y = Math.sin(angle) * radius;
 
-            const tile = this.tilePool.acquire();
+            const tile = document.createElement('button');
+            tile.type = 'button';
+            tile.className = 'wow-letter-wheel__tile';
             tile.dataset.index = String(i);
             tile.textContent = String(this.letters[i] || '').toUpperCase();
             tile.style.transform = `translate(${x}px, ${y}px)`;
 
-            this.element.appendChild(tile);
+            tile.addEventListener('pointerdown', (event) => {
+                event.preventDefault();
+                this.startSelection(i);
+            });
+
+            this.root.appendChild(tile);
             this.tileElements.push(tile);
         }
-    }
-
-    releaseAllTiles() {
-        this.tileElements.forEach((tile) => {
-            this.tilePool.release(tile);
-        });
-        this.tileElements = [];
     }
 
     startSelection(startIndex) {
@@ -189,7 +151,7 @@ export class UIWordLetterWheel extends UISceneElement {
             return;
         }
 
-        const wheelRect = this.element.getBoundingClientRect();
+        const wheelRect = this.root.getBoundingClientRect();
         const points = this.selectedIndices
             .map((index) => this.getTileCenter(index))
             .filter(Boolean)
@@ -239,8 +201,12 @@ export class UIWordLetterWheel extends UISceneElement {
     }
 
     destroy() {
-        this.deactivate();
-        this.releaseAllTiles();
-        super.destroy();
+        window.removeEventListener('pointermove', this.onPointerMove);
+        window.removeEventListener('pointerup', this.onPointerUp);
+        window.removeEventListener('pointercancel', this.onPointerUp);
+
+        if (this.root && this.root.parentNode) {
+            this.root.parentNode.removeChild(this.root);
+        }
     }
 }
