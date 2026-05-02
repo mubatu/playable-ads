@@ -94,6 +94,72 @@ export function getRoyalePlayableUIConfig(options = {}) {
     };
 }
 
+/**
+ * Same building blocks as `getRoyalePlayableUIConfig`, but with distinct element ids
+ * and copy tuned for the `clash-royal-gpt` playable (avoids collisions if multiple
+ * royale-style demos are embedded on one page).
+ */
+export function getClashRoyalGptPlayableUIConfig(options = {}) {
+    const {
+        onPrimaryClick,
+        onCardActivate,
+        cardItems,
+        elixirMax = 10,
+        elixirInitial = 5
+    } = options;
+
+    return {
+        introOverlays: [
+            {
+                id: 'crgpt-intro',
+                title: 'Clash Royale',
+                subtitle:
+                    'Pick a card, then tap your side of the arena to deploy. Cross the river using the bridges, spend elixir wisely, and take the enemy King tower.',
+                buttonId: 'crgpt-play-btn',
+                buttonText: 'BATTLE',
+                visible: true,
+                onPrimaryClick:
+                    typeof onPrimaryClick === 'function'
+                        ? onPrimaryClick
+                        : () => window.dispatchEvent(new CustomEvent('crgpt-play-clicked'))
+            }
+        ],
+        progressBars: [
+            {
+                id: 'crgpt-elixir-bar',
+                initialValue: elixirInitial,
+                max: elixirMax,
+                showText: true,
+                textFormat: (v, max) => `Elixir ${v.toFixed(1)}/${max}`,
+                styles: {
+                    top: '56px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 'min(88vw, 320px)',
+                    zIndex: '70',
+                    padding: '0 8px'
+                }
+            }
+        ],
+        cardRails: [
+            {
+                id: 'crgpt-hand',
+                items: Array.isArray(cardItems) ? cardItems : [],
+                selectedIndex: 0,
+                onItemActivate:
+                    typeof onCardActivate === 'function'
+                        ? onCardActivate
+                        : () => {},
+                styles: {
+                    rail: {
+                        bottom: '6px'
+                    }
+                }
+            }
+        ]
+    };
+}
+
 export const UISettings = {
     buttons: [
         {
