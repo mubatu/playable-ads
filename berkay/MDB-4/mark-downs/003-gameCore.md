@@ -1,0 +1,215 @@
+# Game Core
+
+Use this file before asking questions about gameplay, controls, camera, entities,
+systems, pacing, or difficulty. The goal is to define a small playable loop that
+can be understood immediately and implemented cleanly in Three.js.
+
+## What Must Be Decided
+
+- Game concept in one sentence.
+- Main player action.
+- Control method.
+- Camera and scene style.
+- Core loop.
+- Player-controlled entity or cursor.
+- Targets, enemies, obstacles, pickups, cards, words, or resources.
+- Number of challenge beats before the playable ends.
+- Whether obstacles are pre-placed, spawned over time, or generated endlessly.
+- Collision shape for each obstacle, enemy, pickup, and player.
+- Whether repeated gameplay objects should use `ObjectPool`.
+- Feedback for correct and incorrect actions.
+- Difficulty curve during the short ad.
+- Tutorial or first-action guidance.
+- Approximate session length.
+
+## Core Loop Checklist
+
+A playable ad should usually follow this shape:
+
+1. Show a clear situation.
+2. Prompt one obvious action.
+3. Let the player perform that action.
+4. Give immediate visual, UI, sound, or motion feedback.
+5. Increase tension or reveal the next target.
+6. End with win, lose, timeout, or CTA.
+
+If the game idea has more than one loop, choose the simplest loop that best sells
+the concept.
+
+## Question Bank
+
+Ask only the questions that are needed for the current user. Do not ask the full
+list at once.
+
+### Concept
+
+- What is the one-sentence game concept?
+- Is this based on an existing game, genre, or ad reference?
+- What should the player understand within the first 3 seconds?
+- What should feel satisfying: destroying, collecting, matching, upgrading,
+  dodging, deploying, solving, racing, or something else?
+
+### Player Action
+
+- What is the player's primary action?
+- Should the action be tap, drag, swipe, joystick movement, card selection,
+  word selection, timed click, or another input?
+- Does the player control one object, many units, a board, a cursor, or UI cards?
+- Should controls be instant, physics-like, grid-based, or path-based?
+
+### Camera And Scene
+
+- Should the game use an orthographic 2D/2.5D look or a perspective 3D camera?
+- Is the scene top-down, side-view, isometric, over-the-shoulder, or front-facing?
+- Should the camera stay fixed, follow a player, pan through the level, or zoom
+  for the finish?
+- Should the ad prioritize portrait layout, landscape layout, or responsive
+  behavior for both?
+
+### Entities And Systems
+
+- What are the key entities the player interacts with?
+- Are there enemies, obstacles, resources, projectiles, cards, lanes, bridges,
+  tiles, letters, or collectibles?
+- If there are obstacles, how many should the player face in the playable ad?
+- Should obstacles be manually placed for a designed path, spawned at intervals,
+  or generated continuously until the ending condition?
+- Should obstacle spacing, size, speed, or shape change over time?
+- What should the collision shape be for each visual hazard: circle, rectangle,
+  capsule, triangle, polygon, or a deliberately smaller forgiving hit area?
+- What values need to be tracked: score, health, timer, progress, elixir, unit
+  count, word progress, combo, or distance?
+- Does anything need to spawn, move, collide, merge, attack, pathfind, or pool?
+- For repeated obstacles, enemies, projectiles, pickups, collectibles, or other
+  temporary meshes, how will object pooling be used?
+
+### Pacing And Difficulty
+
+- How long should one run last?
+- Should the run end after a fixed number of obstacles, a score target, a timer,
+  or a scripted final moment?
+- Should the game become harder over time or stay simple?
+- What mistake can the player make?
+- Should failure be possible, or should the ad guide the player toward success?
+- Does the player need a tutorial hand, intro overlay, countdown, or first move
+  hint?
+
+## Required Clarifications Before Coding
+
+Do not implement gameplay until these are answered or explicitly defaulted with
+reasons in a decision report:
+
+- start trigger,
+- primary input,
+- player movement behavior,
+- challenge object count or spawning rule,
+- session length or progress target,
+- failure collision behavior,
+- collision shape and forgiveness for the player and each obstacle type,
+- object pooling decision for repeated gameplay objects,
+- success condition handoff to the win/lose spec.
+
+## Collision Rules
+
+Visual shape and collision shape must match closely enough that the player never
+feels hit by empty space.
+
+- Do not use full rectangular bounding boxes for triangular, diamond, circular,
+  or irregular hazards unless the visible art is also rectangular.
+- For triangle/spike hazards, use triangle-aware collision, polygon collision, or
+  smaller conservative colliders that sit inside the visible spike.
+- For circles, use circle collision.
+- For diamonds or rotated shapes, use polygon collision or multiple smaller
+  colliders that approximate the visible solid area.
+- Prefer forgiving hit areas in playable ads. It is better for the collider to be
+  slightly smaller than the visible hazard than larger.
+- When using Three.js meshes, do not assume the mesh geometry's bounding box is a
+  fair gameplay collider. Define 2D gameplay colliders explicitly in the same
+  coordinate space as the player.
+- Record the chosen collider type and forgiveness reason in the decision report.
+
+## Object Pool Rules
+
+Repeated gameplay objects should use the reusable `ObjectPool` module instead of
+being created and destroyed continuously.
+
+- Use `ObjectPool` for repeated obstacles, enemies, projectiles, pickups,
+  collectibles, floating text, or other temporary meshes.
+- For runner-style obstacle games, obstacle sets should come from a pool. When an
+  obstacle leaves the screen, release it back to the pool and reset it for reuse.
+- Avoid allocating new geometries/materials in the main game loop.
+- Create shared geometries/materials when possible, and reset position, visible
+  state, gameplay data, and collider data when reusing pooled objects.
+- If pooling is intentionally skipped because the object count is tiny and static,
+  record that reason in the decision report.
+
+## Sensible Defaults
+
+Use these defaults when the user does not care and the choice is low-risk:
+
+- Session length: 15-30 seconds.
+- Obstacle/challenge count: 6-8 beats for a short skill ad, unless the user asks
+  for a one-shot demo or an endless runner.
+- Obstacle spawning: timed spawning for runner-style games; hand-placed obstacles
+  only when the user provides a specific layout reference.
+- Object pooling: use `ObjectPool` for repeated runtime objects such as runner
+  obstacles, enemies, projectiles, pickups, and collectibles.
+- Camera: orthographic 2.5D for simple touch-first playables.
+- First interaction: visible tutorial hand or intro overlay.
+- Controls: tap or drag for broad mobile accessibility.
+- Collision forgiveness: player and hazards use colliders about 10-20% smaller
+  than the visible art for skill-based mobile playables.
+- Feedback: scale pop, particles, progress bar, sound cue, and short text.
+- Difficulty: one easy first success, then one small escalation.
+
+Defaults must be written with reasons. Example: `Obstacle count: 6, chosen
+because the user did not specify length and this gives enough repeated practice
+for a short playable ad.`
+
+## Decision Fields
+
+When decisions are made, append a short report below this section using only the
+fields that matter:
+
+```md
+## Decision Report - YYYY-MM-DD
+
+- Concept:
+- Core loop:
+- First player action:
+- Control method:
+- Camera/scene style:
+- Player entity:
+- Targets/obstacles:
+- Challenge count/spawn rule:
+- Collision model:
+- Object pooling:
+- Resources/progress values:
+- Feedback:
+- Tutorial guidance:
+- Session length:
+- Defaults chosen by AI and reasons:
+- Unresolved or deferred:
+```
+
+## Decision Report - 2026-05-09
+
+- Source: user interview + reference sketch (`src/assets/reference-level-sketch.png`)
+- Concept: Flappy Bird–style obstacle course: player keeps a bird aloft and steers through gaps while the world scrolls.
+- Core loop: Wait on pre-start → first tap starts run → each tap applies upward impulse; constant gravity; scroll obstacles past the bird; pass gaps or collide.
+- First player action: Tap anywhere to begin (same input as flap); before start, a hand overlay indicates tapping the screen.
+- Control method: Tap / click (single obvious action, mobile-first).
+- Camera/scene style: Side-view, orthographic 2.5D (touch-friendly, readable gaps); world scrolls horizontally; portrait-first layout if responsive.
+- Player entity: Single bird avatar at fixed X; vertical motion + flap physics similar to Flappy Bird.
+- Targets/obstacles: Three authored “beats” matching the sketch: (1) top/bottom triangular spikes with one central gap; (2) mid-screen diamond hazard with upper and lower routes and edge spikes; (3) second top/bottom spike pair with central gap. Optional simple ground/ceiling bounds if needed for containment.
+- Challenge count/spawn rule: Hand-placed static layout for the three groups (not endless spawn), aligned to the user’s reference image.
+- Collision model: Explicit 2D gameplay colliders per hazard type—polygon or conservative triangles for spikes/diamond (no oversized AABB that extends past visible art); bird uses a slightly smaller circle or capsule for forgiveness (~10–15% under visible size per ad guidelines).
+- Object pooling: Pool repeated obstacle *instances* if the implementation reuses segments off-screen; if the level is a fixed small set of meshes with no runtime spawn/recycle, document no-pool choice in implementation notes.
+- Resources/progress values: Optional distance or “gates cleared” for internal win trigger; no score UI unless added later.
+- Feedback: Brief motion/rotation on flap; hit stop or flash on lose; win moment when passing final beat.
+- Tutorial guidance: Recognizable hand/pointer overlay prompting tap; hidden or idle until first tap starts the game.
+- Session length: Short single run (one course), typically under ~30s for a clean pass—exact tuning during implementation.
+- What the user explicitly requested: Imitate Flappy Bird; hand shows user to click; game starts on first click; reference image defines obstacle layout.
+- What the AI inferred from the reference: Left-to-right course flow; three distinct obstacle configurations; bird faces right; diamond middle implies choose high or low path.
+- Defaults chosen by AI and reasons: Orthographic side view and hand-placed three-beat level—standard for sketch-driven layout and keeps scope to one ad-length course. Forgiving colliders—required for mobile playable ads.
+- Unresolved or deferred: Exact scroll speed, gravity, and flap strength (tune in build); optional score display; whether a visible “finish line” marker is desired beyond clearing the third gap.
