@@ -1,0 +1,38 @@
+{
+    "background": {
+        "sourceWidth": 1080,
+        "sourceHeight": 1920,
+        "worldHeight": 19.2,
+        "textureUrl": "src/assets/background.png"
+    },
+    "board": {
+        "columns": 5,
+        "rows": 12,
+        "gap": 0.05,
+        "tileSize": 1.2,
+        "offsetY": -1.5
+    },
+    "slots": {
+        "count": 3,
+        "offsetY": 6.5,
+        "gap": 0.1,
+        "size": 1.5
+    },
+    "gameplay": {
+        "winConditionClears": 5,
+        "tileColors": [
+            "green",
+            "purple",
+            "red",
+            "yellow"
+        ]
+    },
+    "tutorial": {
+        "enabled": true,
+        "gesture": "click",
+        "size": 120,
+        "duration": 1.0,
+        "loopDelay": 0.5,
+        "startDelayMs": 1000
+    }
+}
