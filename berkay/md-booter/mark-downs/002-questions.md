@@ -14,7 +14,13 @@ of implementation-ready requirements.
   privately to translate user answers into technical choices.
 - If the user gives enough information for a section, summarize the decision
   instead of asking another question.
-- If a decision is low-risk, choose a sensible default and record it.
+- If a decision is low-risk, choose a sensible default, record it, and include
+  the reason for that default.
+- Do not implement after only the concept snapshot. The AI must complete at
+  least one core gameplay pass and one win/lose/end-screen pass first.
+- Do not silently choose game length, obstacle count, win trigger, lose trigger,
+  end-screen copy, or CTA behavior. Ask the user or record an explicit default
+  with a reason before implementation.
 
 ## Required Topic Reads
 
@@ -48,7 +54,10 @@ Useful questions:
 - What is the player's primary action?
 - What objects can the player control or affect?
 - What creates challenge or tension?
-- How long should one playable run last?
+- How long should one playable run last, or how many challenge beats should it
+  contain?
+- For obstacle games, how many obstacles should appear before the end state, and
+  should obstacles spawn continuously or be pre-placed?
 
 ### 3. Win/Lose And CTA
 
@@ -60,6 +69,9 @@ Useful questions:
 - Can the player lose, or should the ad always end positively?
 - What should the end screen say?
 - Should the CTA open after win, after lose, after timeout, or on button press?
+
+This stage is mandatory. If the user has not specified the end screen, the AI
+must ask for it or record a default with a reason before coding.
 
 ### 4. Theme And Presentation
 
@@ -79,6 +91,18 @@ the answers. Do not mention the hidden inventory to the user. It is fine to say
 that the project already has reusable scene, UI, drag, timer, tutorial, sound,
 or pooling utilities when speaking generally.
 
+### 6. Spec Checkpoint
+
+Before editing `index.html` or `src/`, write a short requirement summary and
+append decision reports to the matching files under `game-name/mark-downs/`.
+
+The checkpoint must include:
+
+- confirmed user answers,
+- inferred reference-image decisions,
+- AI defaults and reasons,
+- unresolved items intentionally deferred.
+
 ## Completion Criteria
 
 The AI has enough information to implement when it can answer:
@@ -93,6 +117,10 @@ The AI has enough information to implement when it can answer:
 - What is shown on the intro, tutorial, end screen, and CTA?
 - What theme, asset direction, and sound direction are expected?
 - Which reusable modules are useful for implementation?
+- Have decision reports been written under the current game's `mark-downs/`
+  folder?
+- Has the user either answered or received clear defaults for obstacle count,
+  session length, end screen, and CTA behavior?
 
 ## Decision Report Template
 
@@ -114,7 +142,8 @@ topic file. Do not add unrelated documentation. Use this format:
 - End screen/CTA:
 - Theme:
 - Reusable module notes:
-- Defaults chosen by AI:
+- Defaults chosen by AI and reasons:
+- Unresolved or deferred:
 ```
 
 If a decision belongs mainly to one topic, record it in that topic file:

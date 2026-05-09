@@ -84,6 +84,25 @@ The final ad should usually have:
 - If an answer is missing but the decision is low-risk, make a sensible default,
   clearly record it, and continue.
 
+## Required Decision Logging
+
+The AI must record decisions inside the current game's markdown folder before
+implementation. This means appending decision reports to the topic files under
+`game-name/mark-downs/`, not to a separate plan and not only in chat.
+
+Every decision report must include:
+
+- what the user explicitly requested,
+- what the AI inferred from references or screenshots,
+- which defaults the AI chose,
+- why each default was chosen,
+- which questions are still unresolved, if any.
+
+The AI is not allowed to silently decide important gameplay or ending details.
+If it chooses a default for speed, obstacle count, session length, difficulty,
+win condition, lose condition, end-screen text, CTA behavior, or visual style,
+it must write both the decision and the reason into the matching markdown file.
+
 ## Handoff Into Implementation
 
 After the question flow is complete, the AI should produce a short requirement
@@ -99,5 +118,6 @@ summary before coding:
 - theme and assets,
 - reusable modules selected from the private module inventory.
 
-Only after this summary is coherent should the AI move on to creating or editing
-the playable ad files.
+Only after this summary is coherent and the matching decision reports have been
+written under `game-name/mark-downs/` should the AI move on to creating or
+editing the playable ad files.

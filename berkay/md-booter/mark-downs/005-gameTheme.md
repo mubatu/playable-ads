@@ -13,6 +13,7 @@ coherent without letting theme choices make the scope too large.
 - UI style and text tone.
 - Required intro, tutorial, win, lose, and CTA copy.
 - Asset sources or placeholder strategy.
+- How reference images should be interpreted.
 - Sound direction.
 - Performance and file-size expectations.
 
@@ -39,6 +40,8 @@ Ask only what is missing.
 - What colors should dominate?
 - Are there characters, props, logos, or environments that must appear?
 - Should this match an existing game folder, screenshot, or brand style?
+- If the user provides a sketch or reference image, which parts should be copied:
+  shapes, layout, colors, obstacle style, character style, UI, or mood?
 
 ### Scene And Assets
 
@@ -48,6 +51,8 @@ Ask only what is missing.
   objects?
 - Are there existing assets in the project that should be reused?
 - Can placeholders be used until final assets are provided?
+- If a reference image is rough, should the AI preserve the rough geometry or
+  clean it into polished game shapes?
 - Should the ad support portrait, landscape, or both?
 
 ### UI And Copy
@@ -84,6 +89,11 @@ Use these defaults when the user does not care and the decision is low-risk:
 - Use placeholders for missing assets, but name them clearly in code/config.
 - Use short UI copy: one instruction, one result line, one CTA.
 - Use sound effects only after user interaction to avoid autoplay problems.
+- Interpret rough sketches as gameplay/layout references unless the user says
+  they are final art.
+
+Defaults must be written with reasons. Example: `Obstacle style: sharp triangles,
+chosen because the user's sketch shows repeated triangular hazards.`
 
 ## Decision Fields
 
@@ -97,6 +107,7 @@ fields that matter:
 - Environment:
 - Mood/color palette:
 - Camera presentation:
+- Reference interpretation:
 - Required assets:
 - Placeholder strategy:
 - Intro copy:
@@ -105,5 +116,6 @@ fields that matter:
 - CTA copy:
 - Sound direction:
 - Constraints:
-- Defaults chosen by AI:
+- Defaults chosen by AI and reasons:
+- Unresolved or deferred:
 ```

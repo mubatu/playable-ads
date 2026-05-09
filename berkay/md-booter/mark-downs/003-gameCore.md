@@ -13,6 +13,8 @@ can be understood immediately and implemented cleanly in Three.js.
 - Core loop.
 - Player-controlled entity or cursor.
 - Targets, enemies, obstacles, pickups, cards, words, or resources.
+- Number of challenge beats before the playable ends.
+- Whether obstacles are pre-placed, spawned over time, or generated endlessly.
 - Feedback for correct and incorrect actions.
 - Difficulty curve during the short ad.
 - Tutorial or first-action guidance.
@@ -67,6 +69,10 @@ list at once.
 - What are the key entities the player interacts with?
 - Are there enemies, obstacles, resources, projectiles, cards, lanes, bridges,
   tiles, letters, or collectibles?
+- If there are obstacles, how many should the player face in the playable ad?
+- Should obstacles be manually placed for a designed path, spawned at intervals,
+  or generated continuously until the ending condition?
+- Should obstacle spacing, size, speed, or shape change over time?
 - What values need to be tracked: score, health, timer, progress, elixir, unit
   count, word progress, combo, or distance?
 - Does anything need to spawn, move, collide, merge, attack, pathfind, or pool?
@@ -74,22 +80,45 @@ list at once.
 ### Pacing And Difficulty
 
 - How long should one run last?
+- Should the run end after a fixed number of obstacles, a score target, a timer,
+  or a scripted final moment?
 - Should the game become harder over time or stay simple?
 - What mistake can the player make?
 - Should failure be possible, or should the ad guide the player toward success?
 - Does the player need a tutorial hand, intro overlay, countdown, or first move
   hint?
 
+## Required Clarifications Before Coding
+
+Do not implement gameplay until these are answered or explicitly defaulted with
+reasons in a decision report:
+
+- start trigger,
+- primary input,
+- player movement behavior,
+- challenge object count or spawning rule,
+- session length or progress target,
+- failure collision behavior,
+- success condition handoff to the win/lose spec.
+
 ## Sensible Defaults
 
 Use these defaults when the user does not care and the choice is low-risk:
 
 - Session length: 15-30 seconds.
+- Obstacle/challenge count: 6-8 beats for a short skill ad, unless the user asks
+  for a one-shot demo or an endless runner.
+- Obstacle spawning: timed spawning for runner-style games; hand-placed obstacles
+  only when the user provides a specific layout reference.
 - Camera: orthographic 2.5D for simple touch-first playables.
 - First interaction: visible tutorial hand or intro overlay.
 - Controls: tap or drag for broad mobile accessibility.
 - Feedback: scale pop, particles, progress bar, sound cue, and short text.
 - Difficulty: one easy first success, then one small escalation.
+
+Defaults must be written with reasons. Example: `Obstacle count: 6, chosen
+because the user did not specify length and this gives enough repeated practice
+for a short playable ad.`
 
 ## Decision Fields
 
@@ -106,9 +135,11 @@ fields that matter:
 - Camera/scene style:
 - Player entity:
 - Targets/obstacles:
+- Challenge count/spawn rule:
 - Resources/progress values:
 - Feedback:
 - Tutorial guidance:
 - Session length:
-- Defaults chosen by AI:
+- Defaults chosen by AI and reasons:
+- Unresolved or deferred:
 ```
