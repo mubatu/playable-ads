@@ -69,10 +69,8 @@ export function resetGame(state) {
     var row;
     var col;
     var mesh;
-    var overlay = document.getElementById('game-over-overlay');
-
-    if (overlay) {
-        overlay.remove();
+    if (state.ui.gameOverOverlay) {
+        state.ui.gameOverOverlay.hide();
     }
 
     state.gameOver = false;

@@ -3,9 +3,7 @@ import { findHighestTier } from './Pieces.js';
 import { clearParticles } from './ParticleFX.js';
 
 function getUiElement(uiScene, id) {
-    return uiScene.uiElements.find(function (element) {
-        return element.config.id === id;
-    }) || null;
+    return uiScene.getByConfigId(id);
 }
 
 export function refreshHud(state) {
