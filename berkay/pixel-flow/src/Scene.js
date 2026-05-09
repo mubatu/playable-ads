@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import '../../../resuables/components/HandTutorial.js';
-import { ObjectPool } from '../../../resuables/components/ObjectPool.js';
+import '../../../reusables/components/HandTutorial.js';
+import { ObjectPool } from '../../../reusables/components/ObjectPool.js';
 import { PixelGrid } from './game/PixelGrid.js';
 import { ShooterFactory } from './game/ShooterFactory.js';
 import { SquarePath } from './game/SquarePath.js';
