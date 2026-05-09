@@ -15,6 +15,8 @@ coherent without letting theme choices make the scope too large.
 - Asset sources or placeholder strategy.
 - How reference images should be interpreted.
 - Tutorial hand asset source and expected appearance.
+- Orientation: portrait, landscape, or responsive.
+- Reference images saved under the game assets folder.
 - Sound direction.
 - Performance and file-size expectations.
 
@@ -52,6 +54,9 @@ Ask only what is missing.
   objects?
 - Are there existing assets in the project that should be reused?
 - Can placeholders be used until final assets are provided?
+- If the user provides a reference image, save a copy inside the current game
+  folder, preferably under `src/assets/`, and reference that local path in the
+  decision report.
 - If a reference image is rough, should the AI preserve the rough geometry or
   clean it into polished game shapes?
 - If a hand tutorial is needed, is there a hand/pointer asset inside the game
@@ -100,9 +105,16 @@ Use these defaults when the user does not care and the decision is low-risk:
 If using `HandTutorial`, the hand image must read unmistakably as a hand or
 pointer at mobile size.
 
+- "Built in hand" means the reusable `HandTutorial` module with a local built-in
+  hand asset under `src/assets/`. It does not mean drawing a custom CSS hand,
+  using emoji/text, or writing a separate tutorial system.
 - Do not generate an abstract or blob-like SVG and pass it to `HandTutorial`.
-- Prefer a user-provided hand/pointer asset placed inside the current game
-  folder.
+- Prefer the canonical `words-of-w` style hand for built-in hands: local
+  `src/assets/hand-1.svg`, 256x256 SVG, warm skin gradient, orange sleeve, drop
+  shadow, clear palm, and distinct raised fingers.
+- If no user asset is provided and the user asks for a built-in hand, create or
+  copy a local `src/assets/hand-1.svg` in that canonical style and use it through
+  `HandTutorial.assetUrl`.
 - If no hand asset exists, ask the user for one or record a fallback decision
   before implementation.
 - If the AI creates a fallback asset, it must be a simple, recognizable pointer
@@ -132,6 +144,8 @@ fields that matter:
 - Required assets:
 - Placeholder strategy:
 - Tutorial hand asset:
+- Saved reference assets:
+- Orientation:
 - Intro copy:
 - Tutorial copy:
 - Win/lose copy:

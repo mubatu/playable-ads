@@ -18,9 +18,29 @@ of implementation-ready requirements.
   the reason for that default.
 - Do not implement after only the concept snapshot. The AI must complete at
   least one core gameplay pass and one win/lose/end-screen pass first.
+- Do not implement after the user only gives a game reference, first action,
+  tutorial request, or sketch/reference image. Those answers define the concept,
+  not the full playable ad.
 - Do not silently choose game length, obstacle count, win trigger, lose trigger,
   end-screen copy, or CTA behavior. Ask the user or record an explicit default
   with a reason before implementation.
+
+## Hard Blockers Before Implementation
+
+The AI must not edit `index.html` or `src/` until these are answered by the user
+or explicitly defaulted in decision reports:
+
+- win condition,
+- lose condition,
+- obstacle count or progress target,
+- retry behavior,
+- CTA button text and destination behavior,
+- orientation: portrait, landscape, or responsive,
+- tutorial hand source: user asset, built-in hand, or no hand,
+- whether repeated obstacles/runtime objects use `ObjectPool`.
+
+If the user has only answered the concept prompt, ask the next small batch. Do
+not start coding.
 
 ## Required Topic Reads
 
@@ -45,6 +65,8 @@ Useful questions:
   another genre?
 - Is there a reference game, screenshot, video, or existing folder to follow?
 
+After this stage, continue asking questions. Do not implement yet.
+
 ### 2. Core Gameplay
 
 Read `003-gameCore.md`, then ask about the main interaction and game loop.
@@ -58,6 +80,10 @@ Useful questions:
   contain?
 - For obstacle games, how many obstacles should appear before the end state, and
   should obstacles spawn continuously or be pre-placed?
+
+For Flappy Bird or runner-style games, if the user says "win after 10 obstacles",
+the implementation must include 10 passable obstacle sets. A sketch with fewer
+shapes is a visual reference, not permission to reduce the win target.
 
 ### 3. Win/Lose And CTA
 
@@ -81,8 +107,12 @@ Useful questions:
 
 - What environment, characters, colors, and mood should the ad use?
 - Should the scene be 2D-style orthographic, 2.5D, or full 3D perspective?
+- Should the ad be portrait, landscape, or responsive?
 - What UI copy should appear on intro, tutorial, win, lose, or CTA screens?
 - Are there required assets, logos, sounds, or brand constraints?
+- If the user wants a built-in hand, confirm that this means the reusable
+  `HandTutorial` module using a local built-in hand asset, not a custom tutorial
+  animation.
 
 ### 5. Private Implementation Planning
 
@@ -121,6 +151,8 @@ The AI has enough information to implement when it can answer:
   folder?
 - Has the user either answered or received clear defaults for obstacle count,
   session length, end screen, and CTA behavior?
+- Has the user either answered or received clear defaults for orientation and
+  tutorial hand source?
 
 ## Decision Report Template
 

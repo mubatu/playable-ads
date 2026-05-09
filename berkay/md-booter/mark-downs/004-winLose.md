@@ -28,7 +28,9 @@ Before coding, the AI must know or record defaults for:
 - whether collision or mistakes cause losing,
 - what the end screen says,
 - what button or CTA appears,
+- where the CTA navigates or how the click should be handled,
 - whether replay is allowed,
+- whether retry appears on win, lose, both, or neither,
 - what happens to input, timers, tutorials, and movement after ending.
 
 If the user has not answered these, ask the next 1-4 questions. If the user wants
@@ -79,6 +81,7 @@ Ask only what is missing.
 - If yes, what causes loss: timer, enemy reaching base, health reaching zero,
   wrong puzzle move, falling, missing target, or another condition?
 - Should losing stop the ad, show a retry, or still lead to the CTA?
+- Should retry appear only after losing, or also after winning?
 - Should failure be dramatic, funny, soft, or barely emphasized?
 
 ### Timer And Progress
@@ -95,6 +98,7 @@ Ask only what is missing.
 - What should the lose screen title say?
 - What subtitle should explain the result or next step?
 - What CTA button text should be used?
+- Where should the CTA navigate?
 - Should the CTA appear automatically, after a button press, or after a delay?
 - Should there be a replay button, or only the CTA?
 
@@ -106,6 +110,7 @@ Use these defaults when the user does not care and the decision is low-risk:
 - For runner-style games, default to win after 6-8 successful obstacles only if
   the user did not specify an ending, and record why.
 - If failure exists, still offer a CTA.
+- If the user says "retry only if he loses", do not show retry on the win screen.
 - Stop or hide tutorial guidance when the game ends.
 - Stop timers and prevent further gameplay input after end state.
 - Use a clear button such as `Play Now`, `Install`, `Continue`, or `Try Again`.
@@ -131,6 +136,7 @@ fields that matter:
 - End-screen subtitle:
 - CTA copy:
 - CTA trigger:
+- CTA destination:
 - Replay/reset behavior:
 - Gameplay cleanup:
 - Defaults chosen by AI and reasons:

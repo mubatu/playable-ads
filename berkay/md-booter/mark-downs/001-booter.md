@@ -87,6 +87,10 @@ The final ad should usually have:
   satisfies it.
 - If an answer is missing but the decision is low-risk, make a sensible default,
   clearly record it, and continue.
+- Never start implementation after only the user provides the game concept,
+  first action, tutorial request, or reference image. Continue the interview
+  until win/lose, obstacle/progress target, CTA/retry, orientation, and tutorial
+  hand source are known or explicitly defaulted.
 
 ## Required Decision Logging
 
@@ -107,6 +111,10 @@ If it chooses a default for speed, obstacle count, session length, difficulty,
 win condition, lose condition, end-screen text, CTA behavior, or visual style,
 it must write both the decision and the reason into the matching markdown file.
 
+If the user provides a value later, such as "win after 10 obstacles", that value
+overrides any earlier default or reference-image inference. The implementation
+must reflect the latest user answer.
+
 ## Handoff Into Implementation
 
 After the question flow is complete, the AI should produce a short requirement
@@ -116,9 +124,12 @@ summary before coding:
 - core player action,
 - camera and control style,
 - entities and obstacles,
+- obstacle/progress target,
 - win condition,
 - lose or timeout condition,
 - end-screen and CTA behavior,
+- orientation,
+- tutorial hand source,
 - theme and assets,
 - reusable modules selected from the private module inventory.
 
@@ -126,8 +137,12 @@ Before declaring the playable complete, the AI must sanity-check:
 
 - tutorial guidance uses a recognizable hand/pointer asset if `HandTutorial` is
   used,
+- "built in hand" uses the reusable `HandTutorial` module with a local
+  `src/assets/hand-1.svg` style asset, not a custom hand implementation,
 - user-provided reference images are saved under the current game's `src/assets/`
   folder and cited in decision reports,
+- if the user says win after passing a specific number of obstacles, the game
+  includes that many passable obstacle sets before winning,
 - visual hazards and gameplay colliders match closely,
 - triangular, circular, diamond, or irregular obstacles do not use oversized
   rectangular hitboxes,

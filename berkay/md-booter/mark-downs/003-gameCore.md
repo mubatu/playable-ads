@@ -74,6 +74,8 @@ list at once.
 - If there are obstacles, how many should the player face in the playable ad?
 - Should obstacles be manually placed for a designed path, spawned at intervals,
   or generated continuously until the ending condition?
+- If the user gives a win target such as "pass 10 obstacles", should all 10 be
+  generated from the start, spawned over time, or pooled/reused as they scroll?
 - Should obstacle spacing, size, speed, or shape change over time?
 - What should the collision shape be for each visual hazard: circle, rectangle,
   capsule, triangle, polygon, or a deliberately smaller forgiving hit area?
@@ -103,6 +105,7 @@ reasons in a decision report:
 - primary input,
 - player movement behavior,
 - challenge object count or spawning rule,
+- exact relationship between the win target and the number of passable obstacles,
 - session length or progress target,
 - failure collision behavior,
 - collision shape and forgiveness for the player and each obstacle type,
@@ -153,6 +156,21 @@ being created and destroyed continuously.
   state, gameplay data, and collider data when reusing pooled objects.
 - If pooling is intentionally skipped because the object count is tiny and static,
   record that reason in the decision report.
+
+## Obstacle Count Rules
+
+The number of visible shapes in a reference sketch is not automatically the
+number of obstacles in the playable. A sketch may define obstacle style or layout
+patterns while the user separately defines the win target.
+
+- If the user says the player wins after passing `N` obstacles, the game must
+  allow the player to pass `N` obstacle sets before the win screen.
+- Do not reduce a user-provided target such as 10 obstacles to 3 because the
+  reference image contains 3 example beats.
+- If only 3 obstacle styles are drawn, reuse those styles through spawning or
+  pooling until the target count is reached.
+- Record whether the game uses authored obstacles, procedural spawning, or pooled
+  repeated obstacle styles.
 
 ## Sensible Defaults
 
