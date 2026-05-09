@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Flappy-style playable</title>
+  <link rel="stylesheet" href="/src/css/main.css">
+</head>
+<body>
+  <div id="game-root">
+    <div id="hud" aria-hidden="true">0 / 10</div>
+    <div id="end-card" role="dialog" aria-modal="true" aria-labelledby="end-title">
+      <h2 id="end-title">You win!</h2>
+      <p id="end-sub">Nice flying.</p>
+      <div class="end-actions">
+        <button type="button" class="primary" id="btn-download">Download Now</button>
+        <button type="button" class="secondary" id="btn-retry">Try Again</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>
