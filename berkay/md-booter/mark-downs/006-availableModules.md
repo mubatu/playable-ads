@@ -293,9 +293,12 @@ repo-level `reusables/` folder.
   - `assetUrl` controls the actual hand image. If `assetUrl` is missing or points
     to a poor generated SVG, the tutorial may show no hand or a shape that does
     not read as a hand.
-  - Do not invent an ambiguous hand SVG just to satisfy `assetUrl`. Prefer a
-    user-provided hand/pointer asset inside the current game folder, or ask for
-    one.
+  - Do not invent an ambiguous hand SVG just to satisfy `assetUrl`.
+  - If the user asks for a built-in hand, create `src/assets/hand-1.svg` from the
+    exact "Default Built-In Hand SVG" template in `005-gameTheme.md` and use that
+    file as `assetUrl`.
+  - Do not approximate, simplify, redraw, inline, or replace the default hand
+    template with a different SVG.
   - If a fallback hand asset is created, it must be visually checked at the final
     `size` and have a clear fingertip anchor. Configure `anchor` so the fingertip
     indicates the target.

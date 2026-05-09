@@ -109,12 +109,14 @@ pointer at mobile size.
   hand asset under `src/assets/`. It does not mean drawing a custom CSS hand,
   using emoji/text, or writing a separate tutorial system.
 - Do not generate an abstract or blob-like SVG and pass it to `HandTutorial`.
-- Prefer the canonical `words-of-w` style hand for built-in hands: local
-  `src/assets/hand-1.svg`, 256x256 SVG, warm skin gradient, orange sleeve, drop
-  shadow, clear palm, and distinct raised fingers.
-- If no user asset is provided and the user asks for a built-in hand, create or
-  copy a local `src/assets/hand-1.svg` in that canonical style and use it through
+- For built-in hands, use the exact default hand SVG template in this file.
+  Save it as local `src/assets/hand-1.svg` and pass that file to
   `HandTutorial.assetUrl`.
+- If no user asset is provided and the user asks for a built-in hand, create or
+  copy local `src/assets/hand-1.svg` from the template below and use it through
+  `HandTutorial.assetUrl`.
+- Do not approximate the default hand, simplify it, convert it to a tiny inline
+  data URL, redraw it with different paths, or create a new hand design.
 - If no hand asset exists, ask the user for one or record a fallback decision
   before implementation.
 - If the AI creates a fallback asset, it must be a simple, recognizable pointer
@@ -124,6 +126,37 @@ pointer at mobile size.
   by `HandTutorial` and record why it is acceptable.
 - Set `assetUrl`, `size`, `anchor`, and optional `rotation` so the fingertip, not
   the palm center, points at the intended tap/drag target.
+
+### Default Built-In Hand SVG
+
+When the user asks for a built-in hand, create `src/assets/hand-1.svg` with this
+exact content:
+
+```svg
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow" x="0" y="0" width="256" height="256" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#09111C" flood-opacity="0.36"/>
+    </filter>
+    <linearGradient id="sleeve" x1="74" y1="160" x2="140" y2="240" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFB970"/>
+      <stop offset="1" stop-color="#F06B4F"/>
+    </linearGradient>
+    <linearGradient id="hand" x1="100" y1="28" x2="184" y2="188" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF5E0"/>
+      <stop offset="1" stop-color="#F0D5B1"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#shadow)">
+    <path d="M76 154C76 140.745 86.7452 130 100 130H141C154.255 130 165 140.745 165 154V181C165 194.255 154.255 205 141 205H100C86.7452 205 76 194.255 76 181V154Z" fill="url(#sleeve)"/>
+    <path d="M101.503 40.375C101.503 31.8847 108.387 25 116.878 25C125.368 25 132.253 31.8847 132.253 40.375V102.188H136.503V31.375C136.503 22.8847 143.387 16 151.878 16C160.368 16 167.253 22.8847 167.253 31.375V104.938H171.503V42.125C171.503 33.6347 178.387 26.75 186.878 26.75C195.368 26.75 202.253 33.6347 202.253 42.125V126.929C202.253 158.481 176.671 184.063 145.119 184.063H127.454C91.5398 184.063 62.4113 154.934 62.4113 119.02V89.5625C62.4113 80.542 69.7232 73.23 78.7438 73.23C87.7643 73.23 95.0763 80.542 95.0763 89.5625V109.375H101.503V40.375Z" fill="url(#hand)"/>
+    <path d="M95.0762 109.375H101.503V145.313C101.503 153.804 94.6186 160.688 86.1284 160.688C77.6381 160.688 70.7534 153.804 70.7534 145.313V119.02C70.7534 113.731 75.0409 109.444 80.3291 109.444H95.0762V109.375Z" fill="url(#hand)"/>
+    <path d="M130.253 106.188V39.375C130.253 32.6805 124.822 27.25 118.128 27.25C111.433 27.25 106.003 32.6805 106.003 39.375V120.625" stroke="#E7C49C" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M164.003 104.938V31.875C164.003 25.1805 158.572 19.75 151.878 19.75C145.183 19.75 139.753 25.1805 139.753 31.875V102.188" stroke="#E7C49C" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M198.503 127V42.625C198.503 35.9305 193.072 30.5 186.378 30.5C179.683 30.5 174.253 35.9305 174.253 42.625V105.875" stroke="#E7C49C" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
+</svg>
+```
 
 Defaults must be written with reasons. Example: `Obstacle style: sharp triangles,
 chosen because the user's sketch shows repeated triangular hazards.`

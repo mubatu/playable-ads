@@ -13,12 +13,11 @@ inside the current `game-name/` folder and use only that folder's `mark-downs/`,
 - If `HandTutorial` is used, the `assetUrl` must point to a recognizable hand or
   pointer asset. Do not generate a vague blob-like SVG and call it a hand.
 - "Built in hand" means use the reusable `HandTutorial` module with a local
-  `src/assets/hand-1.svg` in the polished hand style.
+  `src/assets/hand-1.svg` copied exactly from the "Default Built-In Hand SVG"
+  template in `mark-downs/005-gameTheme.md`.
 - If no hand asset exists inside the game folder, ask the user for one or record
   a clear fallback decision before implementation.
-- Use the polished `words-of-w` style hand asset for new games: local
-  `src/assets/hand-1.svg`, 256x256, warm skin gradient, orange sleeve, drop
-  shadow, clear palm, and distinct raised fingers.
+- Do not approximate, simplify, redraw, inline, or replace the default hand SVG.
 - Save user-provided reference images under the current game's `src/assets/`
   folder and cite the local path in markdown decisions.
 - If the user says the player wins after passing `N` obstacles, implement `N`

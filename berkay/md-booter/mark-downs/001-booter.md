@@ -138,7 +138,8 @@ Before declaring the playable complete, the AI must sanity-check:
 - tutorial guidance uses a recognizable hand/pointer asset if `HandTutorial` is
   used,
 - "built in hand" uses the reusable `HandTutorial` module with a local
-  `src/assets/hand-1.svg` style asset, not a custom hand implementation,
+  `src/assets/hand-1.svg` copied exactly from the "Default Built-In Hand SVG"
+  template in `005-gameTheme.md`, not a custom hand implementation,
 - user-provided reference images are saved under the current game's `src/assets/`
   folder and cited in decision reports,
 - if the user says win after passing a specific number of obstacles, the game
