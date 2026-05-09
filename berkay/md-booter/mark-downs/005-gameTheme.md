@@ -14,6 +14,7 @@ coherent without letting theme choices make the scope too large.
 - Required intro, tutorial, win, lose, and CTA copy.
 - Asset sources or placeholder strategy.
 - How reference images should be interpreted.
+- Tutorial hand asset source and expected appearance.
 - Sound direction.
 - Performance and file-size expectations.
 
@@ -53,6 +54,8 @@ Ask only what is missing.
 - Can placeholders be used until final assets are provided?
 - If a reference image is rough, should the AI preserve the rough geometry or
   clean it into polished game shapes?
+- If a hand tutorial is needed, is there a hand/pointer asset inside the game
+  folder, or should the AI ask for one before using `HandTutorial`?
 - Should the ad support portrait, landscape, or both?
 
 ### UI And Copy
@@ -92,6 +95,24 @@ Use these defaults when the user does not care and the decision is low-risk:
 - Interpret rough sketches as gameplay/layout references unless the user says
   they are final art.
 
+## Tutorial Hand Asset Rules
+
+If using `HandTutorial`, the hand image must read unmistakably as a hand or
+pointer at mobile size.
+
+- Do not generate an abstract or blob-like SVG and pass it to `HandTutorial`.
+- Prefer a user-provided hand/pointer asset placed inside the current game
+  folder.
+- If no hand asset exists, ask the user for one or record a fallback decision
+  before implementation.
+- If the AI creates a fallback asset, it must be a simple, recognizable pointer
+  hand with clear index finger, thumb, palm, outline, and contrast. Avoid vague
+  mitten shapes.
+- After creating a fallback hand asset, visually sanity-check it at the size used
+  by `HandTutorial` and record why it is acceptable.
+- Set `assetUrl`, `size`, `anchor`, and optional `rotation` so the fingertip, not
+  the palm center, points at the intended tap/drag target.
+
 Defaults must be written with reasons. Example: `Obstacle style: sharp triangles,
 chosen because the user's sketch shows repeated triangular hazards.`
 
@@ -110,6 +131,7 @@ fields that matter:
 - Reference interpretation:
 - Required assets:
 - Placeholder strategy:
+- Tutorial hand asset:
 - Intro copy:
 - Tutorial copy:
 - Win/lose copy:

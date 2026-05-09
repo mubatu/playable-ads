@@ -118,6 +118,17 @@ summary before coding:
 - theme and assets,
 - reusable modules selected from the private module inventory.
 
+Before declaring the playable complete, the AI must sanity-check:
+
+- tutorial guidance uses a recognizable hand/pointer asset if `HandTutorial` is
+  used,
+- visual hazards and gameplay colliders match closely,
+- triangular, circular, diamond, or irregular obstacles do not use oversized
+  rectangular hitboxes,
+- collision feels forgiving enough for a mobile playable ad,
+- any fallback asset or collider approximation is recorded with a reason in the
+  matching markdown decision report.
+
 Only after this summary is coherent and the matching decision reports have been
 written under `game-name/mark-downs/` should the AI move on to creating or
 editing the playable ad files.

@@ -287,8 +287,18 @@ repo-level `reusables/` folder.
   - `setConfig(config)`
   - `destroy()`
 - Use when: the player needs a first-tap, drag, or path instruction.
-- Caveat: this module is not an ES export. Load it for side effects or with a
-  script tag, then use `window.HandTutorial`.
+- Caveats:
+  - This module is not an ES export. Load it for side effects or with a script
+    tag, then use `window.HandTutorial`.
+  - `assetUrl` controls the actual hand image. If `assetUrl` is missing or points
+    to a poor generated SVG, the tutorial may show no hand or a shape that does
+    not read as a hand.
+  - Do not invent an ambiguous hand SVG just to satisfy `assetUrl`. Prefer a
+    user-provided hand/pointer asset inside the current game folder, or ask for
+    one.
+  - If a fallback hand asset is created, it must be visually checked at the final
+    `size` and have a clear fingertip anchor. Configure `anchor` so the fingertip
+    indicates the target.
 
 ### `reusables/components/Timer.js`
 

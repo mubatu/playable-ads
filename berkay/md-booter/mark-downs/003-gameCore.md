@@ -15,6 +15,7 @@ can be understood immediately and implemented cleanly in Three.js.
 - Targets, enemies, obstacles, pickups, cards, words, or resources.
 - Number of challenge beats before the playable ends.
 - Whether obstacles are pre-placed, spawned over time, or generated endlessly.
+- Collision shape for each obstacle, enemy, pickup, and player.
 - Feedback for correct and incorrect actions.
 - Difficulty curve during the short ad.
 - Tutorial or first-action guidance.
@@ -73,6 +74,8 @@ list at once.
 - Should obstacles be manually placed for a designed path, spawned at intervals,
   or generated continuously until the ending condition?
 - Should obstacle spacing, size, speed, or shape change over time?
+- What should the collision shape be for each visual hazard: circle, rectangle,
+  capsule, triangle, polygon, or a deliberately smaller forgiving hit area?
 - What values need to be tracked: score, health, timer, progress, elixir, unit
   count, word progress, combo, or distance?
 - Does anything need to spawn, move, collide, merge, attack, pathfind, or pool?
@@ -99,7 +102,27 @@ reasons in a decision report:
 - challenge object count or spawning rule,
 - session length or progress target,
 - failure collision behavior,
+- collision shape and forgiveness for the player and each obstacle type,
 - success condition handoff to the win/lose spec.
+
+## Collision Rules
+
+Visual shape and collision shape must match closely enough that the player never
+feels hit by empty space.
+
+- Do not use full rectangular bounding boxes for triangular, diamond, circular,
+  or irregular hazards unless the visible art is also rectangular.
+- For triangle/spike hazards, use triangle-aware collision, polygon collision, or
+  smaller conservative colliders that sit inside the visible spike.
+- For circles, use circle collision.
+- For diamonds or rotated shapes, use polygon collision or multiple smaller
+  colliders that approximate the visible solid area.
+- Prefer forgiving hit areas in playable ads. It is better for the collider to be
+  slightly smaller than the visible hazard than larger.
+- When using Three.js meshes, do not assume the mesh geometry's bounding box is a
+  fair gameplay collider. Define 2D gameplay colliders explicitly in the same
+  coordinate space as the player.
+- Record the chosen collider type and forgiveness reason in the decision report.
 
 ## Sensible Defaults
 
@@ -113,6 +136,8 @@ Use these defaults when the user does not care and the choice is low-risk:
 - Camera: orthographic 2.5D for simple touch-first playables.
 - First interaction: visible tutorial hand or intro overlay.
 - Controls: tap or drag for broad mobile accessibility.
+- Collision forgiveness: player and hazards use colliders about 10-20% smaller
+  than the visible art for skill-based mobile playables.
 - Feedback: scale pop, particles, progress bar, sound cue, and short text.
 - Difficulty: one easy first success, then one small escalation.
 
@@ -136,6 +161,7 @@ fields that matter:
 - Player entity:
 - Targets/obstacles:
 - Challenge count/spawn rule:
+- Collision model:
 - Resources/progress values:
 - Feedback:
 - Tutorial guidance:
