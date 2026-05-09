@@ -1,14 +1,10 @@
-import * as THREE from 'three';
 import { ConfigLoader } from '../../../../reusables/components/ConfigLoader.js';
 import { SceneSetup } from '../../../../reusables/components/SceneSetup.js';
-import { Background } from '../../../../reusables/components/Background.js';
-import { SceneManager } from './SceneManager.js';
-import { buildBoard, createGrid } from './Board.js';
-import { createGhostGroup } from './Shapes.js';
-import { createParticlePool, clearParticles } from './ParticleFX.js';
-import { initSpawnSlots, bindInteractions } from './Interaction.js';
+import { createGameState, resetGame } from './GameState.js';
+import { initSpawnSlots } from './SpawnSlots.js';
+import { bindInteractions } from './Interaction.js';
 import { buildHud, refreshScoreDisplay } from './Hud.js';
-import { scheduleTutorial, destroyTutorial } from './Tutorial.js';
+import { scheduleTutorial } from './Tutorial.js';
 
 var CONFIG_PATH = 'src/config/game-config.json';
 var appRoot = document.getElementById('app') || document.body;
@@ -21,67 +17,6 @@ function showError(message) {
 
     errorBanner.textContent = message;
     errorBanner.hidden = false;
-}
-
-function createGradientTexture(topColor, bottomColor, width, height) {
-    var canvas = document.createElement('canvas');
-    canvas.width = width || 4;
-    canvas.height = height || 8;
-    var ctx = canvas.getContext('2d');
-    var gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, topColor);
-    gradient.addColorStop(1, bottomColor);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    var texture = new THREE.CanvasTexture(canvas);
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    return texture;
-}
-
-function resetGame(state) {
-    var i;
-    var row;
-    var col;
-    var mesh;
-    var overlay = document.getElementById('game-over-overlay');
-
-    if (overlay) {
-        overlay.remove();
-    }
-
-    state.gameOver = false;
-    state.score = 0;
-    state.drag = null;
-    state.hasUserInteracted = false;
-    state.shakeTime = 0;
-    state.board.position.x = 0;
-    state.board.position.y = state.config.board.offsetY;
-    state.renderer.domElement.style.cursor = 'grab';
-
-    clearParticles(state);
-    destroyTutorial(state);
-
-    for (row = 0; row < state.grid.length; row += 1) {
-        for (col = 0; col < state.grid[row].length; col += 1) {
-            mesh = state.grid[row][col];
-            if (mesh) {
-                state.piecesGroup.remove(mesh);
-                state.grid[row][col] = null;
-            }
-        }
-    }
-
-    for (i = 0; i < state.spawnSlots.length; i += 1) {
-        if (state.spawnSlots[i].group) {
-            state.sceneManager.removeObject(state.spawnSlots[i].group);
-        }
-    }
-    state.spawnSlots = [];
-
-    refreshScoreDisplay(state);
-    initSpawnSlots(state);
-    scheduleTutorial(state);
 }
 
 function startLoop(state) {
@@ -112,28 +47,10 @@ function startLoop(state) {
 }
 
 function createGame(config) {
-    var scene = new THREE.Scene();
-    var camera = new THREE.OrthographicCamera();
-    var renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: false
-    });
-    var bgTexture = createGradientTexture(
-        config.background.gradientTop || '#1a0533',
-        config.background.gradientBottom || '#0d1b2a',
-        4,
-        8
-    );
-    var background = new Background(config.background, bgTexture);
-    var board = buildBoard(config.board);
-    var boardMetrics = board.userData.boardMetrics;
-    var sceneManager = new SceneManager(scene, renderer);
-    var piecesGroup = new THREE.Group();
-    var ghostGroup = createGhostGroup(boardMetrics);
-    var state;
-
-    board.add(piecesGroup);
-    board.add(ghostGroup);
+    var state = createGameState(config);
+    var renderer = state.renderer;
+    var camera = state.camera;
+    var background = state.background;
 
     SceneSetup.configureRenderer(renderer);
     SceneSetup.fitOrthographicCamera(camera, background.size);
@@ -142,39 +59,8 @@ function createGame(config) {
     renderer.domElement.style.touchAction = 'none';
     renderer.domElement.style.cursor = 'grab';
 
-    sceneManager.addObject(background.mesh);
-    sceneManager.addObject(board);
-
-    state = {
-        config: config,
-        scene: scene,
-        camera: camera,
-        renderer: renderer,
-        sceneManager: sceneManager,
-        board: board,
-        boardMetrics: boardMetrics,
-        background: background,
-        piecesGroup: piecesGroup,
-        ghostGroup: ghostGroup,
-        grid: createGrid(config.board.rows, config.board.columns),
-        spawnSlots: [],
-        raycaster: new THREE.Raycaster(),
-        drag: null,
-        score: 0,
-        gameOver: false,
-        fxEnabled: true,
-        particlePool: createParticlePool(),
-        activeParticles: new Set(),
-        shakeTime: 0,
-        uiScene: null,
-        ui: {},
-        tutorial: null,
-        tutorialDelayId: null,
-        hasUserInteracted: false,
-        clock: new THREE.Clock(),
-        animationFrameId: null,
-        onReset: null
-    };
+    state.sceneManager.addObject(background.mesh);
+    state.sceneManager.addObject(state.board);
 
     initSpawnSlots(state);
     buildHud(state, function () {
@@ -192,12 +78,12 @@ function createGame(config) {
     window.BlockBlast = {
         state: state,
         config: config,
-        scene: scene,
+        scene: state.scene,
         camera: camera,
         renderer: renderer,
-        board: board,
+        board: state.board,
         grid: state.grid,
-        sceneManager: sceneManager
+        sceneManager: state.sceneManager
     };
 
     startLoop(state);

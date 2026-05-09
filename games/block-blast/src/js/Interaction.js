@@ -1,7 +1,9 @@
 import * as THREE from 'three';
-import { getShapeBounds, canPlaceShape, placeShapeOnGrid, checkAndClearLines, canAnySlotFit, createShapeGroup, generateShapeSet, updateGhostPreview, hideGhosts } from './Shapes.js';
-import { emitClearParticles, startScreenShake } from './ParticleFX.js';
-import { addScore, showGameOver } from './Hud.js';
+import { getShapeBounds } from './Shapes.js';
+import { createShapeGroup } from './ShapeRenderer.js';
+import { canPlaceShape } from './GridRules.js';
+import { updateGhostPreview, hideGhosts } from './GhostPreview.js';
+import { tryPlaceDraggedShape } from './Gameplay.js';
 import { dismissTutorial } from './Tutorial.js';
 
 var dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -192,61 +194,21 @@ function onPointerMove(event, state) {
     }
 }
 
-function allSlotsPlaced(state) {
-    var i;
-    for (i = 0; i < state.spawnSlots.length; i += 1) {
-        if (!state.spawnSlots[i].placed) {
-            return false;
-        }
-    }
-    return true;
-}
-
 function finishDrag(event, state) {
-    var anchor;
     var slot;
-    var clearResult;
-    var points;
+    var wasPlaced;
 
     if (!state.drag || event.pointerId !== state.drag.pointerId) {
         return;
     }
 
     hideGhosts(state);
-    anchor = state.drag.currentAnchor;
     slot = state.spawnSlots[state.drag.slotIndex];
 
     state.sceneManager.removeObject(state.drag.group);
+    wasPlaced = tryPlaceDraggedShape(state, state.drag);
 
-    if (anchor && canPlaceShape(state.grid, state.drag.shape.cells, anchor.row, anchor.col)) {
-        placeShapeOnGrid(state, state.drag.shape, anchor.row, anchor.col);
-        slot.placed = true;
-
-        points = state.drag.shape.cells.length * state.config.scoring.cellPoints;
-
-        clearResult = checkAndClearLines(state);
-
-        if (clearResult.linesCleared > 0) {
-            points += clearResult.linesCleared * state.config.scoring.linePoints * state.config.board.columns;
-
-            if (clearResult.linesCleared > 1) {
-                points += (clearResult.linesCleared - 1) * state.config.scoring.bonusPerExtraLine * state.config.board.columns;
-            }
-
-            emitClearParticles(state, clearResult.clearedPositions);
-            startScreenShake(state, 0.15 + clearResult.linesCleared * 0.05);
-        }
-
-        addScore(state, points);
-
-        if (allSlotsPlaced(state)) {
-            refreshSpawnSlots(state);
-        }
-
-        if (!canAnySlotFit(state.grid, state.spawnSlots)) {
-            showGameOver(state);
-        }
-    } else {
+    if (!wasPlaced) {
         slot.group.visible = true;
     }
 
@@ -256,45 +218,6 @@ function finishDrag(event, state) {
 
     state.drag = null;
     state.renderer.domElement.style.cursor = 'grab';
-}
-
-function refreshSpawnSlots(state) {
-    var colors = state.config.shapes.colors;
-    var count = state.config.shapes.spawnCount;
-    var cellSize = state.boardMetrics.cellSize;
-    var gap = state.boardMetrics.gap;
-    var spacing = state.config.shapes.spawnSpacing;
-    var scale = state.config.shapes.previewScale;
-    var shapes = generateShapeSet(count, colors);
-    var i;
-    var group;
-    var xPos;
-
-    for (i = 0; i < state.spawnSlots.length; i += 1) {
-        if (state.spawnSlots[i].group) {
-            state.sceneManager.removeObject(state.spawnSlots[i].group);
-        }
-    }
-
-    state.spawnSlots = [];
-
-    for (i = 0; i < count; i += 1) {
-        xPos = (i - (count - 1) / 2) * spacing;
-        group = createShapeGroup(shapes[i], cellSize, gap, scale);
-        group.position.set(xPos, state.config.shapes.spawnOffsetY, state.config.shapes.baseZ);
-
-        state.sceneManager.addObject(group);
-
-        state.spawnSlots.push({
-            shape: shapes[i],
-            group: group,
-            placed: false
-        });
-    }
-}
-
-export function initSpawnSlots(state) {
-    refreshSpawnSlots(state);
 }
 
 export function bindInteractions(state) {
