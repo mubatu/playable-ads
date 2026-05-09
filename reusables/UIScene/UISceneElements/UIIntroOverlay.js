@@ -61,6 +61,7 @@ export class UIIntroOverlay extends UISceneElement {
         }
 
         const title = document.createElement('h2');
+        this.titleEl = title;
         title.className = 'rs-ui-intro-overlay__title';
         title.textContent = this.config.title || '';
         if (this.config.styles?.title) {
@@ -68,6 +69,7 @@ export class UIIntroOverlay extends UISceneElement {
         }
 
         const subtitle = document.createElement('p');
+        this.subtitleEl = subtitle;
         subtitle.className = 'rs-ui-intro-overlay__subtitle';
         subtitle.textContent = this.config.subtitle || '';
         if (this.config.styles?.subtitle) {
@@ -75,6 +77,7 @@ export class UIIntroOverlay extends UISceneElement {
         }
 
         const button = document.createElement('button');
+        this.buttonEl = button;
         button.type = 'button';
         button.id = this.config.buttonId || 'rs-intro-primary';
         button.className = 'rs-ui-intro-overlay__button';
@@ -102,5 +105,23 @@ export class UIIntroOverlay extends UISceneElement {
 
     show() {
         this.element?.classList.add('is-visible');
+    }
+
+    setTitle(title) {
+        if (this.titleEl) {
+            this.titleEl.textContent = title;
+        }
+    }
+
+    setSubtitle(subtitle) {
+        if (this.subtitleEl) {
+            this.subtitleEl.textContent = subtitle;
+        }
+    }
+
+    setButtonText(text) {
+        if (this.buttonEl) {
+            this.buttonEl.textContent = text;
+        }
     }
 }

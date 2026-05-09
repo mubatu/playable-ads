@@ -6,6 +6,7 @@ import { UIDeployBadge } from './UISceneElements/UIDeployBadge.js';
 import { UIProgressBar } from './UISceneElements/UIProgressBar.js';
 import { UIToggle } from './UISceneElements/UIToggle.js';
 import { UIHorizontalCardRail } from './UISceneElements/UIHorizontalCardRail.js';
+import { UIScoreDisplay } from './UISceneElements/UIScoreDisplay.js';
 
 // Factory Map: Links config types to classes
 const UI_ELEMENT_MAP = {
@@ -15,7 +16,8 @@ const UI_ELEMENT_MAP = {
     'deployBadges': UIDeployBadge,
     'progressBars': UIProgressBar,
     'toggles': UIToggle,
-    'cardRails': UIHorizontalCardRail
+    'cardRails': UIHorizontalCardRail,
+    'scoreDisplays': UIScoreDisplay
 };
 
 export class UIScene {
