@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Flappy-style playable</title>
+  <link rel="stylesheet" href="/src/css/main.css">
+</head>
+<body>
+  <div id="hud" aria-hidden="true">Gates: 0 / 3</div>
+  <div id="end-overlay" role="dialog" aria-modal="true" aria-labelledby="end-title">
+    <div id="end-panel">
+      <h2 id="end-title"></h2>
+      <p id="end-subtitle"></p>
+      <button type="button" id="end-cta"></button>
+      <button type="button" id="end-replay" class="secondary-cta">Play again</button>
+    </div>
+  </div>
+  <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>
