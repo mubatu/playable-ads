@@ -11,6 +11,7 @@ The AI must work inside one game folder only. The expected structure is:
 
 ```text
 game-name/
+  README.md
   mark-downs/
   index.html
   src/
@@ -22,6 +23,7 @@ other playable ad examples or reverse-engineer how other games were built.
 
 The AI may only use:
 
+- `game-name/README.md` if present,
 - markdown files under `game-name/mark-downs/`,
 - `game-name/index.html`,
 - files and folders under `game-name/src/`,
@@ -35,12 +37,14 @@ open the actual reusable component source outside the game folder.
 ## Required Reading Order
 
 1. Read this file first.
-2. Read `002-questions.md` to understand how to interview the user.
-3. Read the topic file that matches the next requirement area:
+2. Read `README.md` if it exists in the current game folder. Treat it as a
+   project checklist that may contain important implementation warnings.
+3. Read `002-questions.md` to understand how to interview the user.
+4. Read the topic file that matches the next requirement area:
    - `003-gameCore.md` for gameplay, controls, entities, pacing, and core loop.
    - `004-winLose.md` for win state, lose state, CTA, replay, and end screens.
    - `005-gameTheme.md` for visual style, story, UI tone, assets, and sound.
-4. Read `006-availableModules.md` privately before planning implementation.
+5. Read `006-availableModules.md` privately before planning implementation.
 
 ## Purpose
 
@@ -127,6 +131,10 @@ Before declaring the playable complete, the AI must sanity-check:
 - visual hazards and gameplay colliders match closely,
 - triangular, circular, diamond, or irregular obstacles do not use oversized
   rectangular hitboxes,
+- triangle, spike, diamond, circle, and irregular hazard code does not rely on
+  rectangle/AABB helper functions such as `circleRectOverlap`, `hitTestRect`,
+  `Box2`, `Box3`, or bounding boxes unless the visible hazard itself is
+  rectangular,
 - repeated obstacles, enemies, projectiles, pickups, collectibles, or temporary
   meshes use `ObjectPool` unless a decision report explains why pooling is not
   needed,

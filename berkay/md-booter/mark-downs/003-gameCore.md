@@ -116,6 +116,10 @@ feels hit by empty space.
 
 - Do not use full rectangular bounding boxes for triangular, diamond, circular,
   or irregular hazards unless the visible art is also rectangular.
+- Do not implement triangle/spike or diamond collisions with rectangle/AABB
+  helpers such as `circleRectOverlap`, `hitTestRect`, `Box2`, `Box3`, bounding
+  boxes, or pipe-style top/bottom rectangles. These still behave like square
+  colliders even if the mesh looks triangular.
 - For triangle/spike hazards, use triangle-aware collision, polygon collision, or
   smaller conservative colliders that sit inside the visible spike.
 - For circles, use circle collision.
@@ -126,6 +130,13 @@ feels hit by empty space.
 - When using Three.js meshes, do not assume the mesh geometry's bounding box is a
   fair gameplay collider. Define 2D gameplay colliders explicitly in the same
   coordinate space as the player.
+- For polygon hazards, store collider vertices in gameplay/world coordinates and
+  test the player circle against the polygon edges/interior. AABB prechecks are
+  allowed only as a broad-phase optimization; they must not be the final hit
+  result for non-rectangular hazards.
+- During implementation review, search the gameplay code for rectangle collision
+  helper names and confirm none are used as the final collider for triangular,
+  diamond, circular, or irregular hazards.
 - Record the chosen collider type and forgiveness reason in the decision report.
 
 ## Object Pool Rules
