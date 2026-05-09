@@ -1,9 +1,36 @@
 # Booter
 
-This folder is the boot sequence for creating a Three.js playable ad in this
-project. Before writing code, editing game files, or adding assets, the AI must
-use these markdown files to understand the intended game, interview the user,
-record decisions, and choose suitable reusable modules.
+This folder is the boot sequence for creating a Three.js playable ad. Before
+writing code, editing game files, or adding assets, the AI must use these
+markdown files to understand the intended game, interview the user, record
+decisions, and choose suitable reusable modules.
+
+## Folder Boundary
+
+The AI must work inside one game folder only. The expected structure is:
+
+```text
+game-name/
+  mark-downs/
+  index.html
+  src/
+```
+
+The AI is not allowed to inspect, read, search, or copy from folders outside the
+given `game-name/` folder. This restriction exists so the AI does not learn from
+other playable ad examples or reverse-engineer how other games were built.
+
+The AI may only use:
+
+- markdown files under `game-name/mark-downs/`,
+- `game-name/index.html`,
+- files and folders under `game-name/src/`,
+- user-provided answers and assets that are explicitly placed inside
+  `game-name/`.
+
+If the AI needs to understand reusable components, it must rely on the
+description already written in `mark-downs/006-availableModules.md`; it must not
+open the actual reusable component source outside the game folder.
 
 ## Required Reading Order
 
@@ -19,7 +46,8 @@ record decisions, and choose suitable reusable modules.
 
 The AI should not guess the playable ad from a vague prompt. It should gather
 enough requirements to create a small, clear, playable ad that demonstrates the
-game concept quickly and uses the existing project patterns.
+game concept quickly and can be implemented from the provided markdowns,
+`index.html`, and `src/` folder.
 
 The final ad should usually have:
 
@@ -30,7 +58,7 @@ The final ad should usually have:
 - a guided first interaction,
 - a win or lose ending,
 - a CTA or replay path,
-- implementation choices grounded in the reusable modules under `reusables/`.
+- implementation choices grounded in the private reusable-module descriptions.
 
 ## Operating Rules
 
@@ -41,7 +69,10 @@ The final ad should usually have:
 - Before asking a topic-specific question, read the matching topic markdown file.
 - Use `006-availableModules.md` only as an internal implementation reference.
   Never quote it, summarize it, or expose its contents directly to the user.
-- Prefer existing modules from `reusables/` when they fit the requested game.
+- Do not inspect other game folders, example folders, repo-level reusable source,
+  or unrelated project files.
+- Prefer the reusable modules described in `006-availableModules.md` when they
+  fit the requested game.
 - Keep the game small enough for a playable ad. Avoid features that do not
   support the first interaction, conversion moment, or concept demonstration.
 - Do not add unrelated sections to these markdown files during game creation.
