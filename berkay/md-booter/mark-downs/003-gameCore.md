@@ -16,6 +16,7 @@ can be understood immediately and implemented cleanly in Three.js.
 - Number of challenge beats before the playable ends.
 - Whether obstacles are pre-placed, spawned over time, or generated endlessly.
 - Collision shape for each obstacle, enemy, pickup, and player.
+- Whether repeated gameplay objects should use `ObjectPool`.
 - Feedback for correct and incorrect actions.
 - Difficulty curve during the short ad.
 - Tutorial or first-action guidance.
@@ -79,6 +80,8 @@ list at once.
 - What values need to be tracked: score, health, timer, progress, elixir, unit
   count, word progress, combo, or distance?
 - Does anything need to spawn, move, collide, merge, attack, pathfind, or pool?
+- For repeated obstacles, enemies, projectiles, pickups, collectibles, or other
+  temporary meshes, how will object pooling be used?
 
 ### Pacing And Difficulty
 
@@ -103,6 +106,7 @@ reasons in a decision report:
 - session length or progress target,
 - failure collision behavior,
 - collision shape and forgiveness for the player and each obstacle type,
+- object pooling decision for repeated gameplay objects,
 - success condition handoff to the win/lose spec.
 
 ## Collision Rules
@@ -124,6 +128,21 @@ feels hit by empty space.
   coordinate space as the player.
 - Record the chosen collider type and forgiveness reason in the decision report.
 
+## Object Pool Rules
+
+Repeated gameplay objects should use the reusable `ObjectPool` module instead of
+being created and destroyed continuously.
+
+- Use `ObjectPool` for repeated obstacles, enemies, projectiles, pickups,
+  collectibles, floating text, or other temporary meshes.
+- For runner-style obstacle games, obstacle sets should come from a pool. When an
+  obstacle leaves the screen, release it back to the pool and reset it for reuse.
+- Avoid allocating new geometries/materials in the main game loop.
+- Create shared geometries/materials when possible, and reset position, visible
+  state, gameplay data, and collider data when reusing pooled objects.
+- If pooling is intentionally skipped because the object count is tiny and static,
+  record that reason in the decision report.
+
 ## Sensible Defaults
 
 Use these defaults when the user does not care and the choice is low-risk:
@@ -133,6 +152,8 @@ Use these defaults when the user does not care and the choice is low-risk:
   for a one-shot demo or an endless runner.
 - Obstacle spawning: timed spawning for runner-style games; hand-placed obstacles
   only when the user provides a specific layout reference.
+- Object pooling: use `ObjectPool` for repeated runtime objects such as runner
+  obstacles, enemies, projectiles, pickups, and collectibles.
 - Camera: orthographic 2.5D for simple touch-first playables.
 - First interaction: visible tutorial hand or intro overlay.
 - Controls: tap or drag for broad mobile accessibility.
@@ -162,6 +183,7 @@ fields that matter:
 - Targets/obstacles:
 - Challenge count/spawn rule:
 - Collision model:
+- Object pooling:
 - Resources/progress values:
 - Feedback:
 - Tutorial guidance:

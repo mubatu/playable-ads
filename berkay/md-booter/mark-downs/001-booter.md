@@ -122,9 +122,14 @@ Before declaring the playable complete, the AI must sanity-check:
 
 - tutorial guidance uses a recognizable hand/pointer asset if `HandTutorial` is
   used,
+- user-provided reference images are saved under the current game's `src/assets/`
+  folder and cited in decision reports,
 - visual hazards and gameplay colliders match closely,
 - triangular, circular, diamond, or irregular obstacles do not use oversized
   rectangular hitboxes,
+- repeated obstacles, enemies, projectiles, pickups, collectibles, or temporary
+  meshes use `ObjectPool` unless a decision report explains why pooling is not
+  needed,
 - collision feels forgiving enough for a mobile playable ad,
 - any fallback asset or collider approximation is recorded with a reason in the
   matching markdown decision report.
