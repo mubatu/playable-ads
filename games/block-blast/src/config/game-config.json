@@ -46,7 +46,7 @@
     },
     "tutorial": {
         "enabled": true,
-        "assetUrl": "../../games/merge-mystery/src/assets/hand-2.png",
+        "assetUrl": "src/assets/hand-2.png",
         "gesture": "drag",
         "size": 120,
         "duration": 1.2,
