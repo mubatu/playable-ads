@@ -1,4 +1,4 @@
-import { UIScene } from '../../../reusables/UIScene/UIScene.js';
+import { UIScene } from '../../../../reusables/UIScene/UIScene.js';
 import { findHighestTier } from './Pieces.js';
 import { clearParticles } from './ParticleFX.js';
 

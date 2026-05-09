@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ObjectPool } from '../../../reusables/components/ObjectPool.js';
+import { ObjectPool } from '../../../../reusables/components/ObjectPool.js';
 import { getCellWorldPosition } from './Board.js';
 
 var MERGE_PARTICLE_COLORS = ['#fff5d6', '#ffd88a', '#ffba73', '#ff8f6a'];

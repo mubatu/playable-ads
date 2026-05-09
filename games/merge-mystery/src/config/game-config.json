@@ -1,6 +1,6 @@
 {
     "background": {
-        "texturePath": "assets/background.png",
+        "texturePath": "src/assets/background.png",
         "sourceWidth": 1080,
         "sourceHeight": 1920,
         "worldHeight": 19.2
@@ -18,10 +18,10 @@
     },
     "pieces": {
         "texturePaths": [
-            "assets/cake-1.png",
-            "assets/cake-2.png",
-            "assets/cake-3.png",
-            "assets/cake-4.png"
+            "src/assets/cake-1.png",
+            "src/assets/cake-2.png",
+            "src/assets/cake-3.png",
+            "src/assets/cake-4.png"
         ],
         "initialTier": 1,
         "scale": 1,
@@ -31,7 +31,7 @@
     },
     "tutorial": {
         "enabled": true,
-        "assetUrl": "./assets/hand-2.png",
+        "assetUrl": "src/assets/hand-2.png",
         "gesture": "drag",
         "size": 132,
         "duration": 1.1,

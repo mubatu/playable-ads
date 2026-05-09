@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import { getCellCenter } from './Board.js';
-import { snapPieceToCell, setPieceTier } from './Pieces.js';
-import { emitMergeParticles } from './ParticleFX.js';
-import { refreshHud } from './Hud.js';
+import { resolvePieceDrop } from './MergeRules.js';
 import { dismissTutorial } from './Tutorial.js';
 
 var dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -69,38 +67,6 @@ function findClosestCell(state, localX, localY) {
     }
 
     return closestCell;
-}
-
-function movePieceToCell(state, piece, targetRow, targetColumn) {
-    var sourceRow = piece.userData.row;
-    var sourceColumn = piece.userData.column;
-
-    state.grid[sourceRow][sourceColumn] = null;
-    state.grid[targetRow][targetColumn] = piece;
-    snapPieceToCell(state, piece, targetRow, targetColumn);
-}
-
-function mergePieces(state, sourcePiece, targetPiece) {
-    var sourceRow = sourcePiece.userData.row;
-    var sourceColumn = sourcePiece.userData.column;
-    var targetRow = targetPiece.userData.row;
-    var targetColumn = targetPiece.userData.column;
-    var nextTier = targetPiece.userData.tier + 1;
-
-    state.grid[sourceRow][sourceColumn] = null;
-    state.piecesGroup.remove(sourcePiece);
-    setPieceTier(state, targetPiece, nextTier);
-    snapPieceToCell(state, targetPiece, targetRow, targetColumn);
-    emitMergeParticles(state, targetRow, targetColumn, nextTier);
-    refreshHud(state);
-}
-
-function resetDraggedPiece(state) {
-    if (!state.drag) {
-        return;
-    }
-
-    snapPieceToCell(state, state.drag.piece, state.drag.sourceRow, state.drag.sourceColumn);
 }
 
 function setPointerCapture(canvas, pointerId) {
@@ -186,42 +152,18 @@ function onPointerMove(event, state) {
 function finishDrag(event, state) {
     var draggedPiece;
     var closestCell;
-    var targetPiece;
-    var canMerge;
+    var sourceRow;
+    var sourceColumn;
 
     if (!state.drag || event.pointerId !== state.drag.pointerId) {
         return;
     }
 
     draggedPiece = state.drag.piece;
+    sourceRow = state.drag.sourceRow;
+    sourceColumn = state.drag.sourceColumn;
     closestCell = findClosestCell(state, draggedPiece.position.x, draggedPiece.position.y);
-
-    if (!closestCell) {
-        resetDraggedPiece(state);
-    } else if (
-        closestCell.row === state.drag.sourceRow &&
-        closestCell.column === state.drag.sourceColumn
-    ) {
-        resetDraggedPiece(state);
-    } else {
-        targetPiece = state.grid[closestCell.row][closestCell.column];
-
-        if (!targetPiece) {
-            movePieceToCell(state, draggedPiece, closestCell.row, closestCell.column);
-        } else {
-            canMerge = (
-                targetPiece !== draggedPiece &&
-                targetPiece.userData.tier === draggedPiece.userData.tier &&
-                draggedPiece.userData.tier < state.maxTier
-            );
-
-            if (canMerge) {
-                mergePieces(state, draggedPiece, targetPiece);
-            } else {
-                resetDraggedPiece(state);
-            }
-        }
-    }
+    resolvePieceDrop(state, draggedPiece, closestCell, sourceRow, sourceColumn);
 
     releasePointerCapture(state.renderer.domElement, event.pointerId);
     state.drag = null;
