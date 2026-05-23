@@ -1,0 +1,253 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: #000;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#error-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #ff6b6b;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  font-weight: 600;
+  z-index: 10000;
+  font-size: 14px;
+}
+
+#ui-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#ui-layer > * {
+  pointer-events: auto;
+}
+
+/* Score Display */
+.rs-ui-score-display {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.rs-ui-score-display__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+.rs-ui-score-display__value {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+/* Progress Bar (Timer) */
+.rs-ui-progress-bar {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+}
+
+.rs-ui-progress-bar__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  z-index: 1;
+  transition: width 0.1s ease;
+}
+
+.rs-ui-progress-bar__text {
+  position: relative;
+  z-index: 2;
+  color: white;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+.rs-ui-button {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 700;
+  font-size: 13px;
+  color: white;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Joystick */
+#movement-joystick {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 5;
+}
+
+.rs-ui-joystick-base {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(150, 150, 150, 0.4);
+  border: 2px solid rgba(200, 200, 200, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+}
+
+.rs-ui-joystick-base:active {
+  cursor: grabbing;
+}
+
+.rs-ui-joystick-knob {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+  touch-action: none;
+}
+
+.rs-ui-joystick-knob:active {
+  cursor: grabbing;
+}
+
+/* Intro Overlay */
+.rs-ui-intro-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.rs-ui-intro-overlay__content {
+  text-align: center;
+  color: white;
+}
+
+.rs-ui-intro-overlay__title {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.rs-ui-intro-overlay__subtitle {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #ffff00;
+  opacity: 0.9;
+}
+
+.rs-ui-intro-overlay__button {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+  min-width: 160px;
+  margin: 10px;
+  transition: all 0.2s ease;
+}
+
+.rs-ui-intro-overlay__button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.rs-ui-intro-overlay__button:active {
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .rs-ui-intro-overlay__title {
+    font-size: 28px;
+  }
+
+  .rs-ui-intro-overlay__subtitle {
+    font-size: 18px;
+  }
+
+  .rs-ui-joystick-base {
+    width: 80px;
+    height: 80px;
+  }
+
+  .rs-ui-joystick-knob {
+    width: 32px;
+    height: 32px;
+  }
+}

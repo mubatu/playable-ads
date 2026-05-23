@@ -1,0 +1,47 @@
+{
+    "background": {
+        "sourceWidth": 1080,
+        "sourceHeight": 1920,
+        "worldHeight": 19.2,
+        "gradientTop": "#87CEEB",
+        "gradientBottom": "#5B9BD5"
+    },
+    "hole": {
+        "initialDiameter": 1.5,
+        "maxDiameter": 10,
+        "speed": 5,
+        "growthSmall": 0.08,
+        "growthMedium": 0.18,
+        "growthLarge": 0.35
+    },
+    "map": {
+        "size": 28,
+        "groundColor": "#7EC850",
+        "roadColor": "#666666",
+        "sidewalkColor": "#CCCCAA"
+    },
+    "camera": {
+        "angle": 60,
+        "baseDistance": 10,
+        "smoothing": 0.08,
+        "zoomOutPerUnit": 0.6
+    },
+    "scoring": {
+        "smallPoints": 10,
+        "mediumPoints": 50,
+        "largePoints": 200
+    },
+    "timer": {
+        "duration": 30
+    },
+    "tutorial": {
+        "enabled": true,
+        "assetUrl": "src/assets/hand-2.png",
+        "gesture": "drag",
+        "size": 120,
+        "duration": 1.2,
+        "loopDelay": 0.5,
+        "startDelayMs": 500,
+        "autoHideMs": 3000
+    }
+}

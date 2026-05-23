@@ -1,0 +1,84 @@
+{
+    "background": {
+        "sourceWidth": 1080,
+        "sourceHeight": 1920,
+        "worldHeight": 19.2
+    },
+    "world": {
+        "skyColor": "#87CEEB",
+        "groundColor": "#90EE90",
+        "ambientLightIntensity": 0.7,
+        "directionalLightIntensity": 0.8,
+        "mapSize": 50
+    },
+    "player": {
+        "initialDiameter": 1.5,
+        "maxDiameter": 10,
+        "moveSpeed": 8,
+        "consumeAnimationDuration": 0.3
+    },
+    "objects": {
+        "spawnCount": 30,
+        "poolSize": 50,
+        "categories": [
+            {
+                "name": "small",
+                "size": 0.4,
+                "diameter": 0.8,
+                "color": "#FF6B6B",
+                "points": 10,
+                "count": 10
+            },
+            {
+                "name": "medium",
+                "size": 1.2,
+                "diameter": 2.4,
+                "color": "#4ECDC4",
+                "points": 50,
+                "count": 10
+            },
+            {
+                "name": "large",
+                "size": 2.5,
+                "diameter": 5,
+                "color": "#45B7D1",
+                "points": 200,
+                "count": 10
+            }
+        ]
+    },
+    "gameplay": {
+        "gameDuration": 30,
+        "tutorialDuration": 3
+    },
+    "camera": {
+        "fov": 45,
+        "rotationX": -60,
+        "rotationY": 0,
+        "rotationZ": 0,
+        "distance": 12,
+        "maxDistance": 20
+    },
+    "joystick": {
+        "enabled": true,
+        "maxRadius": 50,
+        "position": {
+            "bottom": "20px",
+            "left": "20px"
+        }
+    },
+    "ui": {
+        "scoreLabel": "Score",
+        "timerLabel": "Time",
+        "tutorialText": "Move to eat objects"
+    },
+    "tutorial": {
+        "enabled": true,
+        "assetUrl": "src/assets/hand-1.svg",
+        "gesture": "drag",
+        "size": 100,
+        "duration": 1.5,
+        "loopDelay": 0.5,
+        "startDelayMs": 500
+    }
+}

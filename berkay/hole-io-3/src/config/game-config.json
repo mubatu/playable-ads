@@ -1,0 +1,49 @@
+{
+    "player": {
+        "initialDiameter": 1.5,
+        "maxDiameter": 10,
+        "moveSpeed": 5,
+        "consumptionAnimDuration": 0.3,
+        "growthSmall": 0.15,
+        "growthMedium": 0.3,
+        "growthLarge": 0.6
+    },
+    "game": {
+        "duration": 30,
+        "tutorialDuration": 3,
+        "worldSize": 22
+    },
+    "camera": {
+        "baseHeight": 12,
+        "baseOffset": 6,
+        "zoomPerUnit": 0.6,
+        "followSpeed": 0.08
+    },
+    "environment": {
+        "smallCount": 20,
+        "mediumCount": 12,
+        "largeCount": 8
+    },
+    "scoring": {
+        "small": 10,
+        "medium": 50,
+        "large": 200
+    },
+    "joystick": {
+        "maxRadius": 50,
+        "styles": {
+            "position": "absolute",
+            "bottom": "20px",
+            "left": "20px",
+            "zIndex": "5"
+        }
+    },
+    "tutorial": {
+        "enabled": true,
+        "assetUrl": "../hole-io-2/src/assets/hand.png",
+        "gesture": "drag",
+        "duration": 1.5,
+        "loopDelay": 0.5,
+        "startDelayMs": 500
+    }
+}
