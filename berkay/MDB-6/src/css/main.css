@@ -1,0 +1,174 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #f4f4f4;
+  color: #111;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#hud {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+#hud .pill {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+#hand-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 18%;
+  transform: translate(-50%, 0);
+  width: min(120px, 28vw);
+  height: min(120px, 28vw);
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#hand-hint.visible {
+  opacity: 1;
+}
+
+#hand-hint img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.22));
+  animation: hand-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes hand-pulse {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.04);
+  }
+}
+
+#tap-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+}
+
+#tap-layer.disabled {
+  pointer-events: none;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(245, 245, 245, 0.86);
+  backdrop-filter: blur(6px);
+}
+
+.overlay.visible {
+  display: flex;
+}
+
+.overlay-card {
+  width: min(360px, 100%);
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px 22px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+.overlay-card h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.overlay-card p {
+  margin: 0 0 20px;
+  color: #444;
+  line-height: 1.45;
+  font-size: 15px;
+}
+
+.overlay-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.overlay-actions.row {
+  flex-direction: row;
+}
+
+.overlay-actions.row .btn {
+  flex: 1;
+}
+
+.btn {
+  appearance: none;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #ff8a3d, #e86b1c);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(232, 107, 28, 0.35);
+}
+
+.btn-secondary {
+  background: #111;
+  color: #fff;
+}

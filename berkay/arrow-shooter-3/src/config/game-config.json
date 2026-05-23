@@ -1,0 +1,134 @@
+{
+  "designSize": { "width": 1080, "height": 1920 },
+  "cta": {
+    "label": "Play Now",
+    "url": "https://example.com/play"
+  },
+  "copy": {
+    "winTitle": "Board Cleared!",
+    "loseTitle": "Conveyor Jammed!",
+    "retryLabel": "Try Again"
+  },
+  "scoring": { "perArrow": 10 },
+  "board": {
+    "rows": 8,
+    "columns": 8,
+    "cellSize": 0.82,
+    "position": { "x": 0, "y": 0.05, "z": 0 },
+    "panelDepth": 0.22,
+    "cellGap": 0.06,
+    "panelColor": "#1a2238",
+    "cellColor": "#24304f",
+    "cellHighlight": "#2f3d63"
+  },
+  "camera": {
+    "fov": 38,
+    "position": { "x": 0, "y": 11.5, "z": 10.5 },
+    "target": { "x": 0, "y": 0, "z": 0 },
+    "near": 0.1,
+    "far": 120
+  },
+  "visual": {
+    "fogColor": "#0a0f1a",
+    "fogNear": 18,
+    "fogFar": 42,
+    "ambientIntensity": 0.55,
+    "sunIntensity": 1.1,
+    "sunPosition": { "x": 6, "y": 14, "z": 8 }
+  },
+  "arrow": {
+    "unitWidth": 0.52,
+    "unitDepth": 0.72,
+    "unitHeight": 0.28,
+    "headScale": 1.05,
+    "connectorWidth": 0.18,
+    "connectorHeight": 0.14,
+    "moveSpeed": 5.5,
+    "shakeDuration": 0.35,
+    "colors": {
+      "red": "#ff5c5c",
+      "blue": "#4da3ff",
+      "green": "#5cd67a",
+      "yellow": "#ffd34d",
+      "purple": "#b57bff",
+      "cyan": "#4de0e8"
+    }
+  },
+  "conveyor": {
+    "capacity": 5,
+    "speed": 1.35,
+    "margin": 1.15,
+    "trackWidth": 0.35,
+    "trackColor": "#3a4a6b",
+    "unitSpacing": 0.78,
+    "exitBlockRadius": 0.55,
+    "jamGraceMs": 400
+  },
+  "shooters": {
+    "y": 1.2,
+    "z": -5.1,
+    "bulletCount": 5,
+    "fireInterval": 0.42,
+    "aimThresholdX": 0.22,
+    "aimThresholdZ": 0.28,
+    "bulletSpeed": 9,
+    "slots": [
+      { "x": -2.1, "color": "red", "bullets": 5, "queue": ["blue"] },
+      { "x": 0, "color": "green", "bullets": 5, "queue": ["yellow"] },
+      { "x": 2.1, "color": "blue", "bullets": 5, "queue": ["purple"] }
+    ]
+  },
+  "level": {
+    "arrows": [
+      {
+        "id": "a1",
+        "color": "red",
+        "headDirection": "up",
+        "cells": [[7, 3], [6, 3], [5, 3]]
+      },
+      {
+        "id": "a2",
+        "color": "yellow",
+        "headDirection": "up",
+        "cells": [[7, 1], [6, 1]]
+      },
+      {
+        "id": "a3",
+        "color": "green",
+        "headDirection": "right",
+        "cells": [[1, 2], [1, 3], [1, 4]]
+      },
+      {
+        "id": "a4",
+        "color": "blue",
+        "headDirection": "right",
+        "cells": [[4, 6], [5, 6], [6, 6]]
+      },
+      {
+        "id": "a5",
+        "color": "purple",
+        "headDirection": "up",
+        "cells": [[4, 5], [3, 5], [3, 4]]
+      },
+      {
+        "id": "a6",
+        "color": "cyan",
+        "headDirection": "right",
+        "cells": [[2, 6], [2, 7]]
+      }
+    ]
+  },
+  "tutorial": {
+    "enabled": true,
+    "assetUrl": "src/assets/hand-1.svg",
+    "gesture": "tap",
+    "size": 118,
+    "duration": 1.1,
+    "loopDelay": 0.45,
+    "startDelayMs": 900,
+    "targetArrowId": "a1"
+  },
+  "sfx": {
+    "volume": 0.35
+  }
+}
