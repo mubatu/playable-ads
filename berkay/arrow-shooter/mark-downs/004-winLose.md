@@ -143,25 +143,41 @@ fields that matter:
 - Unresolved or deferred:
 ```
 
-## Decision Report - 2026-05-09
+## Decision Report - 2026-05-17
 
+- Source: GDD.md and user interview.
+- GDD specifies: the loop ends when there are 5 arrows on the conveyor and none of them are being hit.
+- User explicitly requested: win by clearing the full board, lose with the jam condition, show Play Now with retry only after losing, and leave the store URL to be configured later.
 - Ending model: win or lose.
-- Win condition: the player wins after successfully passing 10 obstacle sets.
-- Lose condition: hitting any obstacle immediately loses the run.
-- Timeout behavior: no timeout; progress is based on passed obstacles.
-- End-screen title: win shows "Great Job!"; lose shows "Try Again!".
-- End-screen subtitle: win encourages the player to keep flying; lose prompts a retry while still offering the CTA.
-- CTA copy: "Play Now".
-- CTA trigger: CTA appears on both win and lose end screens.
-- CTA destination: placeholder click behavior because no store URL was provided.
-- Replay/reset behavior: win screen includes Replay; lose screen includes Retry.
-- Gameplay cleanup: scrolling, collision, progress updates, and tutorial guidance stop when the game ends.
-- Defaults chosen by AI and reasons: no countdown was added because the user selected a fixed obstacle target; placeholder CTA behavior is used until a destination is provided.
-- Unresolved or deferred: final app store URL or ad-network CTA callback name.
+- Win condition: all arrows on the 8x8 board are cleared.
+- Lose condition: 5 arrows are on the conveyor and no conveyor arrow is currently being hit by a same-color shooter.
+- Timeout behavior: no timeout by default; the jam state is the lose pressure.
+- End-screen title: default win title is `Board Cleared!`; default lose title is `Conveyor Jammed!`.
+- End-screen subtitle: default win subtitle is `Great solve - keep clearing puzzles.`; default lose subtitle is `Try a smarter order and keep the arrows moving.`
+- CTA copy: `Play Now`.
+- CTA trigger: show end overlay immediately after win or lose; CTA activates only when the button is pressed.
+- CTA destination: store URL placeholder/config field to be filled later.
+- Replay/reset behavior: show Retry only after losing; do not show Retry on the win screen.
+- Gameplay cleanup: stop tutorial, block further board input, stop active movement/timers, and keep the final board state visible behind the overlay.
+- Defaults chosen by AI and reasons: no countdown because the GDD already defines a clear jam fail state; default copy is short and conversion-friendly because final brand/store copy was not provided; CTA is button-triggered because the user selected a future store URL instead of an immediate navigation target.
+- Unresolved or deferred: final store URL and any brand-specific end-screen copy remain deferred until provided.
 
-## Decision Report - 2026-05-09 UI Component Update
+## Decision Report - 2026-05-17 Correction
 
-- Source: user requested that the playable use the UI scene components described in the local module inventory.
-- End-screen/CTA: progress, start prompt, end overlay, CTA, and replay/retry controls should be built through the reusable UI scene layer instead of custom hand-built DOM.
-- Defaults chosen by AI and reasons: kept the existing win/lose copy and CTA behavior because the request changed the implementation approach, not the user-facing flow.
-- Unresolved or deferred: final CTA destination is still not provided.
+- Source: user correction after first implementation pass.
+- Lose condition correction: the 5-arrow limit applies to arrows moving on the conveyor loop, not to parked conveyor slots.
+- Shooter state correction: an arrow only counts as being hit when a matching shooter can target it while it is passing the shooter row.
+- Defaults chosen by AI and reasons: add a short jam grace window so the moving conveyor does not fail on a single frame between shots, while still preserving the GDD's jam fail state.
+
+## Decision Report - 2026-05-17 Shooter Targeting Correction
+
+- Source: user correction after observing an arrow survive despite enough shooter bullets.
+- Shooter state correction: a conveyor arrow counts as shootable if any visible unit, not only its lead point, is passing under a matching shooter.
+- Lose/jam implication: the jam check uses the same per-unit shootable logic, so a full conveyor does not falsely jam while a trailing unit can still be hit.
+
+## Decision Report - 2026-05-17 Jam Timing Correction
+
+- Source: user correction after observing an instant jam with 5 conveyor arrows that would be destroyed if the game continued.
+- Issue found: jam detection checked only whether a unit was exactly shootable on the current frame, which is too strict for a moving conveyor.
+- Lose condition correction: a full conveyor jams only when there is no current or imminent shooter match for any conveyor arrow, no release animation is entering the conveyor, and no shooter replacement is in progress.
+- Defaults chosen by AI and reasons: preserve the exact per-unit aim rule for shooting, but use broader future-match logic for losing because conveyor arrows need time to reach the shooter row.

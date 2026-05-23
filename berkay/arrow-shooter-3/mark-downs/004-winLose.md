@@ -143,25 +143,18 @@ fields that matter:
 - Unresolved or deferred:
 ```
 
-## Decision Report - 2026-05-09
+## Decision Report - 2026-05-17
 
-- Ending model: win or lose.
-- Win condition: the player wins after successfully passing 10 obstacle sets.
-- Lose condition: hitting any obstacle immediately loses the run.
-- Timeout behavior: no timeout; progress is based on passed obstacles.
-- End-screen title: win shows "Great Job!"; lose shows "Try Again!".
-- End-screen subtitle: win encourages the player to keep flying; lose prompts a retry while still offering the CTA.
-- CTA copy: "Play Now".
-- CTA trigger: CTA appears on both win and lose end screens.
-- CTA destination: placeholder click behavior because no store URL was provided.
-- Replay/reset behavior: win screen includes Replay; lose screen includes Retry.
-- Gameplay cleanup: scrolling, collision, progress updates, and tutorial guidance stop when the game ends.
-- Defaults chosen by AI and reasons: no countdown was added because the user selected a fixed obstacle target; placeholder CTA behavior is used until a destination is provided.
-- Unresolved or deferred: final app store URL or ad-network CTA callback name.
-
-## Decision Report - 2026-05-09 UI Component Update
-
-- Source: user requested that the playable use the UI scene components described in the local module inventory.
-- End-screen/CTA: progress, start prompt, end overlay, CTA, and replay/retry controls should be built through the reusable UI scene layer instead of custom hand-built DOM.
-- Defaults chosen by AI and reasons: kept the existing win/lose copy and CTA behavior because the request changed the implementation approach, not the user-facing flow.
-- Unresolved or deferred: final CTA destination is still not provided.
+- Source: GDD.md + user interview
+- Win condition: All board arrows gone; all conveyor arrows destroyed; no active bullets or release animations (GDD).
+- Lose condition: Conveyor at capacity (5); no in-flight bullet; no conveyor entry animation; no shooter replacement in progress; no current/future color match between conveyor arrows and shooters with bullets (GDD).
+- End screen/CTA:
+  - Win title: `Board Cleared!`
+  - Lose title: `Conveyor Jammed!`
+  - CTA: `Play Now` → **placeholder URL** `https://example.com/play` (user request; overridable in config).
+  - Retry: **only on lose** (GDD + user confirmed flow).
+- Replay/reset: Retry button on lose overlay restarts the demo level.
+- Defaults chosen by AI and reasons:
+  - CTA opens placeholder URL in a new tab on button press; empty handler not used because user asked for a placeholder URL.
+  - Win overlay shows CTA only (no retry on win) per GDD.
+- Unresolved or deferred: None.

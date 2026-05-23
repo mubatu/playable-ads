@@ -1,5 +1,6 @@
 ﻿import * as THREE from 'three';
 import { ObjectPool } from '../../../../reusables/components/ObjectPool.js';
+import { UIScene } from '../../../../reusables/UIScene/UIScene.js';
 import '../../../../reusables/components/HandTutorial.js';
 
 const CONFIG = {
@@ -30,36 +31,23 @@ root.appendChild(renderer.domElement);
 
 root.insertAdjacentHTML(
   'beforeend',
-  `<div class="hud">
-    <div class="top-bar">
-      <div class="progress-pill" id="progress">0 / ${CONFIG.obstacleTarget}</div>
-    </div>
-    <div class="instruction-pill" id="instruction">
-      <strong>Tap to Fly</strong>
-      <span>Tap to flap!</span>
-    </div>
-  </div>
-  <div class="flash" id="hit-flash"></div>
-  <div class="overlay" id="end-overlay">
-    <div class="panel">
-      <h1 id="end-title">Great Job!</h1>
-      <p id="end-subtitle">You flew through every obstacle.</p>
-      <div class="button-row">
-        <button class="game-button" id="cta-button">Play Now</button>
-        <button class="game-button secondary" id="replay-button">Replay</button>
-      </div>
-    </div>
-  </div>`
+  '<div class="flash" id="hit-flash"></div>'
 );
 
-const progressEl = document.querySelector('#progress');
-const instructionEl = document.querySelector('#instruction');
-const overlayEl = document.querySelector('#end-overlay');
-const titleEl = document.querySelector('#end-title');
-const subtitleEl = document.querySelector('#end-subtitle');
-const ctaButton = document.querySelector('#cta-button');
-const replayButton = document.querySelector('#replay-button');
 const hitFlashEl = document.querySelector('#hit-flash');
+
+const uiScene = new UIScene(createUISettings());
+uiScene.buildUI();
+
+const progressBar = uiScene.getByConfigId('flight-progress');
+const startOverlay = uiScene.getByConfigId('start-overlay');
+const endOverlay = uiScene.getByConfigId('end-overlay');
+const replayButton = uiScene.getByConfigId('replay-button');
+const uiNodes = {
+  startOverlay: getUINode(startOverlay),
+  endOverlay: getUINode(endOverlay),
+  replayButton: getUINode(replayButton),
+};
 
 let worldWidth = 9;
 let worldTop = CONFIG.worldHeight / 2;
@@ -73,7 +61,6 @@ const state = {
   birdVelocity: 0,
   progress: 0,
   spawned: 0,
-  nextSpawnX: 0,
   speed: CONFIG.startSpeed,
   idleTime: 0,
 };
@@ -103,12 +90,138 @@ resize();
 resetGame();
 window.addEventListener('resize', resize);
 window.addEventListener('pointerdown', handlePointerDown, { passive: false });
-ctaButton.addEventListener('pointerdown', stopButtonPointer);
-replayButton.addEventListener('pointerdown', stopButtonPointer);
-ctaButton.addEventListener('click', handleCta);
-replayButton.addEventListener('click', resetGame);
 
 renderer.setAnimationLoop(update);
+
+function createUISettings() {
+  return {
+    progressBars: [
+      {
+        id: 'flight-progress',
+        initialValue: 0,
+        max: CONFIG.obstacleTarget,
+        showText: true,
+        textFormat: (value, max) => `${value} / ${max}`,
+        styles: {
+          wrapper: {
+            position: 'fixed',
+            top: 'max(18px, env(safe-area-inset-top))',
+            left: '18px',
+            width: '150px',
+            zIndex: 3,
+            pointerEvents: 'none',
+          },
+        },
+      },
+    ],
+    introOverlays: [
+      {
+        id: 'start-overlay',
+        title: 'Tap to Fly',
+        subtitle: 'Tap to flap!',
+        buttonId: 'start-button',
+        buttonText: 'Tap',
+        visible: true,
+        onPrimaryClick: () => {
+          if (state.phase === 'ready') {
+            startGame();
+            flap();
+          }
+        },
+        styles: {
+          overlay: {
+            background: 'linear-gradient(180deg, rgba(12, 32, 62, 0.05), rgba(12, 32, 62, 0.16))',
+          },
+        },
+      },
+      {
+        id: 'end-overlay',
+        title: 'Great Job!',
+        subtitle: 'You flew through all 10 obstacles.',
+        buttonId: 'cta-button',
+        buttonText: 'Play Now',
+        visible: false,
+        onPrimaryClick: handleCta,
+        styles: {
+          overlay: {
+            background: 'linear-gradient(180deg, rgba(12, 32, 62, 0.34), rgba(12, 32, 62, 0.66))',
+          },
+        },
+      },
+    ],
+    buttons: [
+      {
+        id: 'replay-button',
+        text: 'Replay',
+        onClick: resetGame,
+        styles: {
+          position: 'fixed',
+          left: '50%',
+          bottom: 'max(72px, calc(env(safe-area-inset-bottom) + 72px))',
+          transform: 'translateX(-50%)',
+          zIndex: 6,
+          display: 'none',
+          minWidth: '220px',
+        },
+      },
+    ],
+  };
+}
+
+function getUINode(component) {
+  return component?.container || component?.element || component?.root || component?.button || null;
+}
+
+function setUIVisible(component, node, visible) {
+  if (visible && typeof component?.show === 'function') {
+    component.show();
+    return;
+  }
+
+  if (!visible && typeof component?.hide === 'function') {
+    component.hide();
+    return;
+  }
+
+  if (node) {
+    node.style.display = visible ? '' : 'none';
+  }
+}
+
+function setOverlayCopy(node, title, subtitle) {
+  if (!node) {
+    return;
+  }
+
+  const titleNode = node.querySelector('h1, h2, [data-role="title"]');
+  const subtitleNode = node.querySelector('p, [data-role="subtitle"]');
+
+  if (titleNode) {
+    titleNode.textContent = title;
+  }
+  if (subtitleNode) {
+    subtitleNode.textContent = subtitle;
+  }
+}
+
+function setButtonText(node, text) {
+  const button = node?.matches?.('button') ? node : node?.querySelector?.('button');
+  if (button) {
+    button.textContent = text;
+  }
+}
+
+function setProgressValue(value) {
+  if (typeof progressBar?.setValue === 'function') {
+    progressBar.setValue(value);
+    return;
+  }
+
+  const node = getUINode(progressBar);
+  if (node) {
+    node.textContent = `${value} / ${CONFIG.obstacleTarget}`;
+  }
+}
 
 function createBackground() {
   const cloudMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.72 });
@@ -345,24 +458,35 @@ function getGapY(index) {
   return pattern[index % pattern.length];
 }
 
-function spawnObstacle() {
+function spawnObstacle(x) {
   const group = obstaclePool.get();
-  configureObstacleSet(group, state.spawned, state.nextSpawnX);
+  configureObstacleSet(group, state.spawned, x);
   if (!group.parent) {
     obstacleLayer.add(group);
   }
   activeObstacles.push(group);
   state.spawned += 1;
-  state.nextSpawnX += CONFIG.obstacleSpacing;
 }
 
 function maintainObstacleQueue() {
+  const spawnAheadX = worldWidth / 2 + CONFIG.obstacleSpacing * 2.4;
+
   while (
     state.spawned < CONFIG.obstacleTarget &&
-    state.nextSpawnX < worldWidth / 2 + CONFIG.obstacleSpacing * 3.2
+    getRightmostObstacleX() < spawnAheadX
   ) {
-    spawnObstacle();
+    const rightmostX = getRightmostObstacleX();
+    const startX = worldWidth / 2 + 3.2;
+    spawnObstacle(Math.max(startX, rightmostX + CONFIG.obstacleSpacing));
   }
+}
+
+function getRightmostObstacleX() {
+  if (activeObstacles.length === 0) {
+    return -Infinity;
+  }
+
+  return activeObstacles.reduce((rightmost, group) => Math.max(rightmost, group.position.x), -Infinity);
 }
 
 function handlePointerDown(event) {
@@ -383,7 +507,7 @@ function handlePointerDown(event) {
 
 function startGame() {
   state.phase = 'playing';
-  instructionEl.style.display = 'none';
+  setUIVisible(startOverlay, uiNodes.startOverlay, false);
   stopHandTutorial();
 }
 
@@ -401,12 +525,14 @@ function resetGame() {
   state.spawned = 0;
   state.speed = CONFIG.startSpeed;
   state.idleTime = 0;
-  state.nextSpawnX = worldWidth / 2 + 3.2;
 
-  overlayEl.classList.remove('visible');
+  setUIVisible(endOverlay, uiNodes.endOverlay, false);
+  if (uiNodes.replayButton) {
+    uiNodes.replayButton.style.display = 'none';
+  }
   hitFlashEl.classList.remove('visible');
-  instructionEl.style.display = 'block';
-  progressEl.textContent = `0 / ${CONFIG.obstacleTarget}`;
+  setUIVisible(startOverlay, uiNodes.startOverlay, true);
+  setProgressValue(0);
 
   while (activeObstacles.length > 0) {
     const group = activeObstacles.pop();
@@ -428,27 +554,24 @@ function endGame(result) {
   stopHandTutorial();
 
   if (result === 'win') {
-    titleEl.textContent = 'Great Job!';
-    subtitleEl.textContent = 'You flew through all 10 obstacles.';
-    replayButton.textContent = 'Replay';
+    setOverlayCopy(uiNodes.endOverlay, 'Great Job!', 'You flew through all 10 obstacles.');
+    setButtonText(uiNodes.replayButton, 'Replay');
   } else {
-    titleEl.textContent = 'Try Again!';
-    subtitleEl.textContent = 'One hit ends the flight. Retry or keep playing.';
-    replayButton.textContent = 'Retry';
+    setOverlayCopy(uiNodes.endOverlay, 'Try Again!', 'One hit ends the flight. Retry or keep playing.');
+    setButtonText(uiNodes.replayButton, 'Retry');
     hitFlashEl.classList.add('visible');
     window.setTimeout(() => hitFlashEl.classList.remove('visible'), 180);
   }
 
-  overlayEl.classList.add('visible');
+  setUIVisible(endOverlay, uiNodes.endOverlay, true);
+  if (uiNodes.replayButton) {
+    uiNodes.replayButton.style.display = '';
+  }
 }
 
 function handleCta() {
   window.dispatchEvent(new CustomEvent('playable:cta', { detail: { label: 'Play Now' } }));
   console.info('Play Now CTA clicked. Add the final store URL or ad-network callback here.');
-}
-
-function stopButtonPointer(event) {
-  event.stopPropagation();
 }
 
 function startHandTutorial() {
@@ -518,7 +641,7 @@ function updatePlaying(delta) {
     if (!group.userData.passed && group.position.x < bird.position.x - 0.72) {
       group.userData.passed = true;
       state.progress += 1;
-      progressEl.textContent = `${state.progress} / ${CONFIG.obstacleTarget}`;
+      setProgressValue(state.progress);
 
       if (state.progress >= CONFIG.obstacleTarget) {
         endGame('win');
