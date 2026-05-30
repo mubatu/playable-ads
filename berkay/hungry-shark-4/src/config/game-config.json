@@ -1,0 +1,80 @@
+{
+    "background": {
+        "sourceWidth": 1080,
+        "sourceHeight": 1920,
+        "worldHeight": 19.2,
+        "gradientTop": "#1a3a52",
+        "gradientBottom": "#0a0e27"
+    },
+    "world": {
+        "width": 12,
+        "height": 19.2,
+        "surfaceY": 8,
+        "deepY": -6
+    },
+    "shark": {
+        "startX": 0,
+        "startY": 0,
+        "startSize": 0.6,
+        "startHealth": 100,
+        "startHunger": 80,
+        "maxHealth": 100,
+        "maxHunger": 100,
+        "speed": 6,
+        "maxSpeed": 8,
+        "boostMultiplier": 1.8,
+        "boostDuration": 0.8,
+        "boostCooldown": 1.5,
+        "acceleration": 0.3,
+        "dragCoefficient": 0.88
+    },
+    "hunger": {
+        "decayRate": 8,
+        "damageWhenStarving": 5,
+        "smallFishRestore": 15,
+        "mediumFishRestore": 30,
+        "humanRestore": 50,
+        "jellyRestoreNone": 0
+    },
+    "spawner": {
+        "smallFishDensity": 0.15,
+        "mediumFishDensity": 0.08,
+        "humanDensity": 0.02,
+        "jellyDensity": 0.04,
+        "mineDensity": 0.02,
+        "coinDropChance": 0.6,
+        "maxEntitiesPerType": 30,
+        "spawnRadius": 8
+    },
+    "scoring": {
+        "smallFish": 1,
+        "mediumFish": 5,
+        "human": 25,
+        "jelly": -5,
+        "mine": -10,
+        "coin": 2,
+        "treasure": 50,
+        "goldRushMultiplier": 3
+    },
+    "goldRush": {
+        "preyThreshold": 12,
+        "timeWindow": 5,
+        "duration": 8,
+        "colorIntensity": 0.8
+    },
+    "collisions": {
+        "jellyDamage": 15,
+        "mineDamage": 25,
+        "torpedoDamage": 20,
+        "eatCooldown": 0.1
+    },
+    "tutorial": {
+        "enabled": true,
+        "assetUrl": "src/assets/hand.png",
+        "gesture": "drag",
+        "size": 100,
+        "duration": 1.2,
+        "loopDelay": 0.5,
+        "startDelayMs": 800
+    }
+}

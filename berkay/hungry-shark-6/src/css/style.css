@@ -1,0 +1,47 @@
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #03045e;
+}
+
+body {
+    touch-action: none;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+}
+
+canvas {
+    display: block;
+}
+
+#error-banner {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(10, 20, 40, 0.9);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.4;
+    z-index: 10;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes goldPulse {
+    0%   { text-shadow: 0 0 16px #ff8c00, 0 0 32px #ff4500; }
+    50%  { text-shadow: 0 0 32px #ffd700, 0 0 64px #ff8c00; }
+    100% { text-shadow: 0 0 16px #ff8c00, 0 0 32px #ff4500; }
+}

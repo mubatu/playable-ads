@@ -7,7 +7,7 @@ import { addScore, updateGameTime, updatePlayerMovement, updateCamera, updatePar
 import { buildHud, refreshScoreDisplay, showGameOver } from './Hud.js';
 import { scheduleTutorial, destroyTutorial } from './Tutorial.js';
 
-const CONFIG_PATH = '/berkay/hole-io-2/src/config/game-config.json';
+const CONFIG_PATH = 'src/config/game-config.json';
 const appRoot = document.getElementById('app') || document.body;
 const errorBanner = document.getElementById('error-banner');
 
