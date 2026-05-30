@@ -1,0 +1,51 @@
+{
+    "background": {
+        "sourceWidth": 1080,
+        "sourceHeight": 1920,
+        "worldHeight": 48,
+        "gradientTop": "#87ceeb",
+        "gradientBottom": "#5dade2"
+    },
+    "session": {
+        "durationSeconds": 30,
+        "tutorialMaxSeconds": 3
+    },
+    "hole": {
+        "initialDiameter": 1.5,
+        "maxDiameter": 10,
+        "moveSpeed": 5,
+        "growthSmall": 0.05,
+        "growthMedium": 0.1,
+        "growthLarge": 0.2,
+        "pulseDuration": 0.25
+    },
+    "camera": {
+        "tiltDegrees": 60,
+        "followDamping": 4,
+        "baseDistance": 14,
+        "distancePerSize": 0.85,
+        "lookHeight": 0
+    },
+    "map": {
+        "groundSize": 42,
+        "spawnRadius": 6
+    },
+    "scoring": {
+        "small": 10,
+        "medium": 50,
+        "large": 200
+    },
+    "tutorial": {
+        "enabled": true,
+        "assetUrl": "src/assets/hand-2.png",
+        "gesture": "drag",
+        "text": "Move to eat objects",
+        "size": 110,
+        "duration": 1.1,
+        "loopDelay": 0.3,
+        "startDelayMs": 200
+    },
+    "download": {
+        "url": "https://google.com"
+    }
+}

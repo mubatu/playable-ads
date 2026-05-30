@@ -1,0 +1,54 @@
+{
+  "background": {
+    "sourceWidth": 1080,
+    "sourceHeight": 1920,
+    "worldHeight": 20,
+    "gradientTop": "#87CEEB",
+    "gradientBottom": "#E0F6FF"
+  },
+  "player": {
+    "initialDiameter": 1.5,
+    "maxDiameter": 10,
+    "moveSpeed": 5,
+    "consumptionAnimDuration": 0.3
+  },
+  "game": {
+    "duration": 30,
+    "tutorialDuration": 3,
+    "worldSize": 25
+  },
+  "environment": {
+    "spawnSmall": [
+      {"type": "cone", "size": 0.3},
+      {"type": "bench", "size": 0.4},
+      {"type": "mailbox", "size": 0.35},
+      {"type": "tree", "size": 0.5},
+      {"type": "lamp", "size": 0.4}
+    ],
+    "spawnMedium": [
+      {"type": "car", "size": 0.9},
+      {"type": "stall", "size": 1.0},
+      {"type": "house", "size": 1.2},
+      {"type": "truck", "size": 1.1}
+    ],
+    "spawnLarge": [
+      {"type": "building", "size": 1.8},
+      {"type": "tower", "size": 2.0},
+      {"type": "apartment", "size": 2.2}
+    ]
+  },
+  "scoring": {
+    "small": 10,
+    "medium": 50,
+    "large": 200
+  },
+  "joystick": {
+    "maxRadius": 50,
+    "styles": {
+      "position": "absolute",
+      "bottom": "20px",
+      "left": "20px",
+      "zIndex": "5"
+    }
+  }
+}

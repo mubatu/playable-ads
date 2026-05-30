@@ -1,0 +1,21 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hand pointing right -->
+  <g transform="translate(20, 20)">
+    <!-- Wrist -->
+    <rect x="15" y="45" width="15" height="20" fill="#FFB6C1" rx="3"/>
+
+    <!-- Palm -->
+    <ellipse cx="30" cy="35" rx="18" ry="20" fill="#FFD9E6"/>
+
+    <!-- Thumb -->
+    <ellipse cx="15" cy="30" rx="6" ry="9" fill="#FFB6C1" transform="rotate(-45 15 30)"/>
+
+    <!-- Fingers -->
+    <rect x="25" y="5" width="8" height="25" fill="#FFB6C1" rx="4"/>
+    <rect x="36" y="8" width="8" height="22" fill="#FFB6C1" rx="4"/>
+    <rect x="47" y="10" width="8" height="20" fill="#FFB6C1" rx="4"/>
+
+    <!-- Index finger highlight -->
+    <rect x="26" y="6" width="3" height="20" fill="#FFFFFF" opacity="0.6" rx="1.5"/>
+  </g>
+</svg>

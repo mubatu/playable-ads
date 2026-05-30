@@ -1,0 +1,102 @@
+import { ConfigLoader } from '../../../../reusables/components/ConfigLoader.js';
+import { SceneSetup } from '../../../../reusables/components/SceneSetup.js';
+import { createGameState } from './GameState.js';
+import { buildWorld, updateBubbles } from './World.js';
+import { buildShark, updateShark } from './Shark.js';
+import { spawnInitialEntities, respawnEntities, updateEntities } from './Spawner.js';
+import { updateHunger } from './HungerSystem.js';
+import { updateGoldRush } from './GoldRush.js';
+import { checkCollisions, updateParticles } from './Collision.js';
+import { updateCamera } from './CameraController.js';
+import { buildHud, updateHud, showGameOver, showCta } from './Hud.js';
+import { bindInteractions } from './Interaction.js';
+import { scheduleTutorial } from './Tutorial.js';
+
+var CONFIG_PATH = 'src/config/game-config.json';
+var appRoot = document.getElementById('app') || document.body;
+var errorBanner = document.getElementById('error-banner');
+var respawnTimer = 0;
+
+function showError(message) {
+    if (!errorBanner) return;
+    errorBanner.textContent = message;
+    errorBanner.hidden = false;
+}
+
+function startLoop(state) {
+    function frame(now) {
+        var delta = Math.min(state.clock.getDelta(), 0.05);
+        if (state.gameStarted && !state.gameOver) state.elapsedTime += delta;
+
+        updateShark(state, delta);
+        updateEntities(state, delta);
+        updateBubbles(state, delta);
+        updateHunger(state, delta);
+        updateGoldRush(state, delta);
+        checkCollisions(state);
+        updateParticles(state, delta);
+        updateCamera(state, delta);
+
+        if (state.gameStarted && !state.gameOver) {
+            respawnTimer += delta;
+            if (respawnTimer >= state.config.spawn.respawnInterval) {
+                respawnTimer = 0;
+                respawnEntities(state);
+            }
+        }
+
+        updateHud(state);
+        if (state.tutorial) state.tutorial.update(now);
+
+        if (state.gameOver && !state._gameOverShown) {
+            state._gameOverShown = true;
+            showGameOver(state);
+        }
+        if (!state.ctaShown && state.gameStarted && !state.gameOver) {
+            var cta = state.config.cta;
+            if (state.score >= cta.showAfterScore || state.elapsedTime >= cta.showAfterSeconds) {
+                state.ctaShown = true;
+                showCta(state);
+            }
+        }
+
+        state.renderer.render(state.scene, state.camera);
+        state.animationFrameId = window.requestAnimationFrame(frame);
+    }
+    frame(performance.now());
+}
+
+function createGame(config) {
+    var state = createGameState(config);
+
+    SceneSetup.configureRenderer(state.renderer);
+    SceneSetup.fitOrthographicCamera(state.camera, state.bgSize);
+
+    appRoot.appendChild(state.renderer.domElement);
+    state.renderer.domElement.style.touchAction = 'none';
+
+    buildWorld(state);
+    state.scene.add(state.worldGroup);
+
+    var shark = buildShark(config.shark);
+    state.sharkGroup = shark;
+    state.worldGroup.add(shark);
+
+    spawnInitialEntities(state);
+    buildHud(state);
+    bindInteractions(state);
+    scheduleTutorial(state);
+
+    window.addEventListener('resize', function () {
+        SceneSetup.configureRenderer(state.renderer);
+        SceneSetup.fitOrthographicCamera(state.camera, state.bgSize);
+    });
+
+    window.HungryShark = { state: state, config: config };
+    startLoop(state);
+}
+
+ConfigLoader.load(CONFIG_PATH).then(createGame).catch(function (err) {
+    console.error(err);
+    showError(err.message + ' Run from a local server so JSON config can load.');
+});

@@ -1,0 +1,73 @@
+{
+    "background": {
+        "sourceWidth": 1080,
+        "sourceHeight": 1920,
+        "worldHeight": 20,
+        "gradientTop": "#0096c7",
+        "gradientBottom": "#03045e"
+    },
+    "world": {
+        "width": 50,
+        "height": 22,
+        "surfaceY": 8.0,
+        "seabedY": -9.0
+    },
+    "shark": {
+        "speed": 6.0,
+        "boostSpeed": 12.0,
+        "turnSpeed": 5.0,
+        "size": 1.2,
+        "bodyColor": "#4a6fa5",
+        "bellyColor": "#c8dbe8",
+        "finColor": "#2c5282"
+    },
+    "hunger": {
+        "max": 100,
+        "initial": 80,
+        "drainRate": 5,
+        "healthDrainRate": 10
+    },
+    "health": {
+        "max": 100,
+        "initial": 100,
+        "mineDamage": 25,
+        "jellyfishDamage": 12
+    },
+    "scoring": {
+        "smallFish": 5,
+        "mediumFish": 20,
+        "human": 35,
+        "creature": 15,
+        "coin": 2,
+        "goldRushMultiplier": 3
+    },
+    "goldRush": {
+        "threshold": 80,
+        "duration": 7,
+        "decayRate": 20
+    },
+    "spawn": {
+        "smallFishCount": 15,
+        "mediumFishCount": 5,
+        "humanCount": 3,
+        "creatureCount": 4,
+        "coinCount": 8,
+        "mineCount": 3,
+        "jellyfishCount": 3,
+        "respawnInterval": 3.5
+    },
+    "camera": {
+        "lerpSpeed": 3.5,
+        "shakeDuration": 0.4,
+        "lookAheadX": 2.0,
+        "lookAheadY": 0.8
+    },
+    "tutorial": {
+        "enabled": true,
+        "startDelayMs": 1200
+    },
+    "cta": {
+        "showAfterScore": 200,
+        "showAfterSeconds": 35
+    }
+}

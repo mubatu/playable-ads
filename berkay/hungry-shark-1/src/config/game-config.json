@@ -1,0 +1,84 @@
+{
+    "background": {
+        "sourceWidth": 1080,
+        "sourceHeight": 1920,
+        "worldHeight": 19.2,
+        "gradientTop": "#0a3d6b",
+        "gradientBottom": "#041228"
+    },
+    "world": {
+        "width": 40,
+        "height": 22,
+        "surfaceY": 7.5,
+        "seabedY": -9.0,
+        "spawnMargin": 2.0
+    },
+    "shark": {
+        "speed": 5.0,
+        "boostSpeed": 9.0,
+        "turnSpeed": 4.0,
+        "size": 1.2,
+        "bodyColor": "#4a6fa5",
+        "bellyColor": "#c8d8e8",
+        "finColor": "#3a5f95",
+        "eyeColor": "#ffffff",
+        "pupilColor": "#111111"
+    },
+    "hunger": {
+        "max": 100,
+        "initial": 80,
+        "drainRate": 6,
+        "eatGainSmall": 15,
+        "eatGainMedium": 25,
+        "eatGainLarge": 40,
+        "healthDrainRate": 12
+    },
+    "health": {
+        "max": 100,
+        "initial": 100,
+        "mineDamage": 30,
+        "jellyfishDamage": 15,
+        "eatHealSmall": 5,
+        "eatHealMedium": 10,
+        "eatHealLarge": 20
+    },
+    "scoring": {
+        "smallFish": 10,
+        "mediumFish": 25,
+        "largeFish": 50,
+        "coin": 5,
+        "goldRushMultiplier": 3
+    },
+    "goldRush": {
+        "threshold": 150,
+        "duration": 5.0,
+        "decayRate": 30
+    },
+    "spawn": {
+        "smallFishCount": 12,
+        "mediumFishCount": 6,
+        "coinCount": 8,
+        "mineCount": 4,
+        "jellyfishCount": 3,
+        "respawnInterval": 3.0,
+        "schoolSize": 3
+    },
+    "tutorial": {
+        "enabled": true,
+        "gesture": "drag",
+        "size": 100,
+        "duration": 1.5,
+        "loopDelay": 0.6,
+        "startDelayMs": 800
+    },
+    "camera": {
+        "followSmoothing": 0.08,
+        "zoomOutAtBoost": 1.15,
+        "shakeIntensity": 0.15,
+        "shakeDuration": 0.3
+    },
+    "cta": {
+        "showAfterScore": 500,
+        "showAfterSeconds": 30
+    }
+}

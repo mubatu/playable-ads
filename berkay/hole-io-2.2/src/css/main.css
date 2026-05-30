@@ -1,0 +1,193 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #87CEEB;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+}
+
+#error-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    font-size: 16px;
+    z-index: 1000;
+    text-align: center;
+}
+
+/* UI Layer Styles */
+#ui-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#ui-layer * {
+    pointer-events: auto;
+}
+
+/* Score Display */
+#score-display {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+/* Timer Display */
+#timer-display {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+/* Joystick Styles */
+#movement-joystick {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 5;
+}
+
+.virtual-joystick-base {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(128, 128, 128, 0.5);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    cursor: grab;
+}
+
+.virtual-joystick-base.active {
+    background: rgba(128, 128, 128, 0.7);
+}
+
+.virtual-joystick-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* End screen overlay */
+.rs-ui-intro {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+.rs-ui-intro.visible {
+    display: flex;
+}
+
+.rs-ui-intro-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1;
+}
+
+.rs-ui-intro-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+}
+
+.rs-ui-intro-title {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.rs-ui-intro-subtitle {
+    font-size: 36px;
+    color: #FFD700;
+    margin-bottom: 40px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.rs-ui-intro-button {
+    background: #FFD700;
+    border: none;
+    border-radius: 8px;
+    padding: 15px 40px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.rs-ui-intro-button:hover {
+    background: #FFC700;
+    transform: scale(1.05);
+}
+
+.rs-ui-intro-button:active {
+    transform: scale(0.98);
+}
+
+/* Tutorial hand */
+.hand-tutorial-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 15;
+}

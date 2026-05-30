@@ -1,0 +1,36 @@
+{
+    "duration": 30,
+    "ctaUrl": "https://google.com",
+    "ground": {
+        "size": 60,
+        "color": "#7ec850",
+        "roadColor": "#5a6470"
+    },
+    "hole": {
+        "initialDiameter": 1.5,
+        "maxDiameter": 10,
+        "speed": 9,
+        "growth": {
+            "small": 0.06,
+            "medium": 0.12,
+            "large": 0.25
+        }
+    },
+    "camera": {
+        "tilt": 60,
+        "baseDistance": 14,
+        "distancePerDiameter": 1.4,
+        "lag": 4
+    },
+    "scoring": {
+        "small": 10,
+        "medium": 50,
+        "large": 200
+    },
+    "tutorial": {
+        "enabled": true,
+        "assetUrl": "src/assets/hand-2.png",
+        "durationSec": 3,
+        "size": 110
+    }
+}

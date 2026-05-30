@@ -1,0 +1,35 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "hole-io",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", ".", "-l", "3001", "--no-clipboard"],
+      "port": 3001
+    },
+    {
+      "name": "hungry-shark-1",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", ".", "-l", "3002", "--no-clipboard"],
+      "port": 3002
+    },
+    {
+      "name": "hungry-shark-2",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", ".", "-l", "3003", "--no-clipboard"],
+      "port": 3003
+    },
+    {
+      "name": "hungry-shark-6",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", ".", "-l", "3006", "--no-clipboard"],
+      "port": 3006
+    },
+    {
+      "name": "hungry-shark-7",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", ".", "-l", "3007", "--no-clipboard"],
+      "port": 3007
+    }
+  ]
+}
